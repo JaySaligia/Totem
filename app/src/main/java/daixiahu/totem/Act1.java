@@ -18,7 +18,7 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-
+            //test
             }
         });
 

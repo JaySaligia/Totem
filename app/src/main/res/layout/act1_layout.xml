@@ -26,7 +26,7 @@
         app:layout_constraintVertical_bias="0.209" />
 
     <Button
-        android:id="@+id/Act2_Button2"
+        android:id="@+id/Act1_Button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create a DB"
