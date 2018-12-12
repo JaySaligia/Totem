@@ -47,4 +47,3 @@ class sbufesc {
     Boolean flag; //dirty bit
 
 }
-
