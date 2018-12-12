@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import java.sql.BatchUpdateException;
 //this is poker
+//hahaha
 public class Act1 extends AppCompatActivity {
 
     @Override
