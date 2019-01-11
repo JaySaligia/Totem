@@ -15,6 +15,27 @@ class TableInfo{
     int tupleNum;//num of tuple
     String[] tupleName = new String[10];//
     int[] tupleType = new int[10];//Type of tuple,0 is string,1 is int,default is 0
+
+    public int createtable(Context cxt, String name, String[] attr, int[] type, int tbid, int dbid){
+        SharedPreferences.Editor editor = cxt.getSharedPreferences("tb" + dbid + "" + "-" + tbid + "" + "Ttb", Context.MODE_PRIVATE).edit();
+        editor.putInt("dbOid", dbid);
+        editor.putInt("tbOid", tbid);
+        editor.putString("tbName", name);
+        editor.putInt("attrNum", attr.length);
+        String attrname = "";
+        for (int i = 0; i < attr.length; i ++){
+            attrname = attrname + attr[i] + ",";
+        }
+        String attrtype = "";
+        editor.putString("attrName", attrname);
+        for (int i = 0; i < type.length; i ++){
+            attrtype = attrtype + type[i] + "" + ",";
+        }
+        editor.putString("attrType", attrtype);
+        editor.apply();
+        return 1;
+    }
+
 }
 
 public class DatabaseManager{
@@ -25,7 +46,7 @@ public class DatabaseManager{
     SharedPreferences dblooker;
     TableInfo[] table = new TableInfo[10];//max table num is 10
 
-    void initsystotal(Context cxt){//初始化系统表
+    public void initsystotal(Context cxt){//初始化系统表
         SharedPreferences.Editor editor = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE).edit();
         editor.putInt("idble", 0);
         editor.putInt("idmax", 0);
@@ -91,19 +112,22 @@ public class DatabaseManager{
             case -1: return -1;
             case -2: return -2;
             default: {
-                dbeditor = cxt.getSharedPreferences("db" + label + "Tdb", Context.MODE_PRIVATE).edit();
-                dblooker = cxt.getSharedPreferences("db" + label + "Tdb", Context.MODE_PRIVATE);
+                dbOid = label;
             }
         }
         return 1;
     }
 
     public int newtable(Context cxt, String name, String[] attr, int[] type){//新建表
+        dblooker = cxt.getSharedPreferences("db" + dbOid + "" + "Tdb", Context.MODE_PRIVATE);
         int count = dblooker.getInt("tbNum", 0);
         String tbstate = dblooker.getString("tb", "");
+        dbeditor = cxt.getSharedPreferences("db" + dbOid + "" + "Tdb", Context.MODE_PRIVATE).edit();
         dbeditor.putInt("tbNum", count + 1);
         dbeditor.putString("tb", tbstate+"1");
-//undo
+        dbeditor.apply();
+        TableInfo newtb = new TableInfo();
+        newtb.createtable(cxt, name, attr, type, count, dbOid);
         return 1;
     }
 
