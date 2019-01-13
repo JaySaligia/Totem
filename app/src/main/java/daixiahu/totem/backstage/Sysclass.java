@@ -3,11 +3,9 @@ package daixiahu.totem.backstage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import java.util.StringJoiner;
+
 
 public class Sysclass {
-
-
 
     public void init(Context cxt){//初始化系统表
             SharedPreferences.Editor editor = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE).edit();
@@ -192,7 +190,9 @@ public class Sysclass {
         editor.putInt("tupleCount", tuplecount - 1);//元组总数-1
         editor.apply();
         //删除link表中的元素和对应代理类中的代理对象
-        for (int i = 1; i < link.length; i ++){
+        if (link[0].equals(""))
+            return 0;//没有link信息
+        for (int i = 0; i < link.length; i ++){
             SharedPreferences linklooker = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE);
             SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();
             String proxytupleid = linklooker.getString("src" + tuplenum, "");
@@ -212,6 +212,32 @@ public class Sysclass {
             else
                 linkeditor.apply();
         }
+        return 1;
+    }
+
+    public int delsrcclass(Context cxt, String classname){//删除源类
+        String classOid = getclassOid(cxt, classname)+"";
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String[] link = looker.getString("classLink","").split("-*-");//获取link信息
+        SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
+        for (int i = 0; i< link.length; i++){
+            SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
+            linkeditor.clear();
+            linkeditor.apply();
+            SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
+            proxyeditor.clear();
+            proxyeditor.apply();
+        }
+        editor.clear();//清空源类
+        editor.apply();
+        //修改系统表信息
+        SharedPreferences syslooker = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE);
+        String idable = syslooker.getString("idable","");
+        int idcount = syslooker.getInt("idcount", 0);
+        SharedPreferences.Editor syseditor = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE).edit();
+        syseditor.putString("idable", classOid + "-*-" + idable);//将删除的类id加入墓碑中
+        syseditor.putInt("idcount", idcount - 1);//类总数-1
+        syseditor.apply();
         return 1;
     }
 }
