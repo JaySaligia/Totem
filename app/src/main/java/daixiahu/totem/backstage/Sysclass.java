@@ -3,6 +3,7 @@ package daixiahu.totem.backstage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Arrays;
 
 
 public class Sysclass {
@@ -16,13 +17,13 @@ public class Sysclass {
 
     String getid(Context cxt){//得到新的类可用id
         SharedPreferences looker = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE);
-        String[] tmp = looker.getString("idable", "0").split("-*-");
+        String[] tmp = looker.getString("idable", "0").split("-@-");
         return tmp[0];
     }
 
     void updatesystotal(Context cxt){//每次新建一个类后修改系统表
         SharedPreferences looker = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE);
-        String[] tmp = looker.getString("idable", "0").split("-*-");
+        String[] tmp = looker.getString("idable", "0").split("-@-");
         String idcount = looker.getInt("idcount", 0)+"";
         SharedPreferences.Editor editor = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE).edit();
         if (tmp[0].equals(idcount)){//没有墓碑id
@@ -32,7 +33,7 @@ public class Sysclass {
         {
             String idablenew = "";
             for (int i = 1; i< tmp.length; i ++){
-                idablenew += (i == tmp.length - 1)?tmp[i]:tmp[i] + "-*-";//形如"1-*-2-*-3"
+                idablenew += (i == tmp.length - 1)?tmp[i]:tmp[i] + "-@-";//形如"1-@-2-@-3"
             }
         }
         editor.putInt("idcount", Integer.parseInt(idcount) + 1);
@@ -89,7 +90,7 @@ public class Sysclass {
         int len = strings.length;
         String ret = "";
         for (int i = 0; i < len; i ++)
-            ret += (i == len - 1) ? strings[i]: strings[i] + "-*-";
+            ret += (i == len - 1) ? strings[i]: strings[i] + "-@-";
         return ret;
     }
 
@@ -97,7 +98,7 @@ public class Sysclass {
         int len = strings.length;
         String ret = "";
         for (int i = 0; i < len; i ++)
-            ret += (i == len - 1) ? strings[i] + "": strings[i] + "" + "-*-";
+            ret += (i == len - 1) ? strings[i] + "": strings[i] + "" + "-@-";
         return ret;
     }
 
@@ -107,7 +108,7 @@ public class Sysclass {
             return -1;//该类不存在
         String classOid = tmp+"";
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
-        String []tupleava = looker.getString("tupleAva", "0").split("-*-");
+        String []tupleava = looker.getString("tupleAva", "0").split("-@-");
         String tuplecount = looker.getInt("tupleCount", 0) + "";
         String tupleid = tupleava[0];
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
@@ -120,7 +121,7 @@ public class Sysclass {
         {
             String tupleavanew = "";
             for (int i = 1; i< tupleava.length; i ++){
-                tupleavanew += (i == tupleava.length - 1)?tupleava[i]:tupleava[i] + "-*-";//形如"1-*-2-*-3"
+                tupleavanew += (i == tupleava.length - 1)?tupleava[i]:tupleava[i] + "-@-";//形如"1-@-2-@-3"
             }
         }
         editor.putInt("tupleCount", Integer.parseInt(tuplecount) + 1);
@@ -135,11 +136,29 @@ public class Sysclass {
         if (classlink.equals(""))
             editor.putString("classLink", proxyid);
         else
-            editor.putString("classLink", classlink + "-*-" + proxyid);
+            editor.putString("classLink", classlink + "-@-" + proxyid);
         editor.apply();
     }
 
-    public int newproxyclass(Context cxt, String classname, String sysclassname,String attr_v[], int type_v[], String attr_r[], int type_r[]){
+    String getsrctype(Context cxt, String classOid, String[] attr_v){
+        String type = "";
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String[] attr_r = looker.getString("attrReal_name", "").split("-@-");
+        String[] type_r = looker.getString("attrReal_type", "").split("-@-");
+        int len = attr_r.length;
+        int len2 = attr_v.length;
+        int count = 0;
+        String[] type_v = new String[len2];
+        for(int i = 0; i < len; i ++){
+            if (Arrays.asList(attr_v).contains(attr_r[i])) {
+                type_v[count] = type_r[i];
+                count ++;
+            }
+        }
+        return makestr_s(type_v);
+    }
+
+    public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String[] attr_r, int type_r[]){
         String classOid = getid(cxt);
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         editor.putString("classOid",classOid);
@@ -154,10 +173,10 @@ public class Sysclass {
         int attrlen_r = attr_r.length;
         //虚属性
         editor.putInt("attrVirtual_num", attrlen_v);
-        String attrVirtual_name = makestr_s(attr_v);
+        String attrVirtual_name = makestr_s(attr_rename);
         editor.putString("attrVirtual_name", attrVirtual_name);
-        String attrVirtual_type = makestr_i(type_r);
-        editor.putString("attrVirtual_type", attrVirtual_type);
+        //String attrVirtual_type = makestr_i(type_v);
+        editor.putString("attrVirtual_type", getsrctype(cxt, sysclassOid, attr_v));
         //实属性
         if (attrlen_r == 0){//没有实属性
             editor.putInt("attrReal_num", 0);
@@ -174,7 +193,7 @@ public class Sysclass {
         editor.putString("tupleAva","0");
         editor.putInt("tupleCount", 0);
         editor.apply();
-        createlinkclass(cxt, sysclassOid, classOid, attrVirtual_name);
+        createlinkclass(cxt, sysclassOid, classOid, makestr_s(attr_v));
         updatesystotal(cxt);
         return 1;
     }
@@ -183,10 +202,10 @@ public class Sysclass {
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         String tupleava = looker.getString("tupleAva", "");
         int tuplecount = looker.getInt("tupleCount", 0);
-        String[] link = looker.getString("classLink", "").split("-*-");
+        String[] link = looker.getString("classLink", "").split("-@-");
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         editor.remove("tuple" + tuplenum);//从源类删除对象
-        editor.putString("tupleAva", tuplenum + "-*-" + tupleava);//增加墓碑元组id
+        editor.putString("tupleAva", tuplenum + "-@-" + tupleava);//增加墓碑元组id
         editor.putInt("tupleCount", tuplecount - 1);//元组总数-1
         editor.apply();
         //删除link表中的元素和对应代理类中的代理对象
@@ -205,7 +224,7 @@ public class Sysclass {
                 String proxytupleava = proxylooker.getString("tupleAva", "");
                 int proxytuplecount = proxylooker.getInt("tupleCount", 0);
                 proxyeditor.remove("tuple" + proxytupleid);//从代理类中删除代理对象；
-                proxyeditor.putString("tupleAva", proxytupleid + "-*-" + proxytupleava);//增加墓碑元组id
+                proxyeditor.putString("tupleAva", proxytupleid + "-@-" + proxytupleava);//增加墓碑元组id
                 proxyeditor.putInt("tupleCount", proxytuplecount - 1);//元组总数-1
                 proxyeditor.apply();
             }
@@ -218,7 +237,7 @@ public class Sysclass {
     public int delsrcclass(Context cxt, String classname){//删除源类
         String classOid = getclassOid(cxt, classname)+"";
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
-        String[] link = looker.getString("classLink","").split("-*-");//获取link信息
+        String[] link = looker.getString("classLink","").split("-@-");//获取link信息
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         for (int i = 0; i< link.length; i++){
             SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
@@ -235,9 +254,19 @@ public class Sysclass {
         String idable = syslooker.getString("idable","");
         int idcount = syslooker.getInt("idcount", 0);
         SharedPreferences.Editor syseditor = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE).edit();
-        syseditor.putString("idable", classOid + "-*-" + idable);//将删除的类id加入墓碑中
+        syseditor.putString("idable", classOid + "-@-" + idable);//将删除的类id加入墓碑中
         syseditor.putInt("idcount", idcount - 1);//类总数-1
         syseditor.apply();
         return 1;
     }
+    public String choosetuple(Context cxt, String classOid, String tupleid,int[] attrid){//选择特定元组
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
+        String tupleret = "";
+        for(int i = 0; i < attrid.length; i ++){
+            tupleret+= "\t" + tupleattr[attrid[i]];
+        }
+        return tupleret;
+    }
+
 }

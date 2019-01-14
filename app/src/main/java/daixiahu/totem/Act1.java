@@ -36,19 +36,21 @@ public class Act1 extends AppCompatActivity {
         c.init(this);
         String[] attr = {"sno","sex","age"};
         int[] type = {0,0,1};
-        String[] attrgroup = {"grade"};
-        int[] typegroup = {1};
+        String[] attrgroup = new String[0];
+        int[] typegroup = new int[0];
         String[] tuple0 = {"xiaoming","male", "18"};
         String[] tuple1 = {"xiaogang", "male", "19"};
         String[] tuple2 = {"xiaohong", "female", "17"};
         c.newsysclass(this, "class1", attr, type);
-        c.newsysclass(this, "class2", attr, type);
-        c.inserttuple(this, "class1", tuple0);
-        c.inserttuple(this, "class1", tuple1);
-        c.inserttuple(this, "class1", tuple2);
-        c.deltuple(this, "0", "0");
-        c.deltuple(this, "0", "1");
-        c.newproxyclass(this, "group1", "class1", attr,type, attrgroup, typegroup);
+        //c.newsysclass(this, "class2", attr, type);
+        //c.inserttuple(this, "class1", tuple0);
+        //c.inserttuple(this, "class1", tuple1);
+        //c.inserttuple(this, "class1", tuple2);
+        //c.deltuple(this, "0", "0");
+        //c.deltuple(this, "0", "1");
+        c.newproxyclass(this, "group1", "class1", attr, attr, attrgroup, typegroup);
+        //int[] t = {0,1};
+        //String test = c.choosetuple(this, "0", "0", t);
         Toast.makeText(Act1.this, "ok", Toast.LENGTH_SHORT).show();
     }
 
