@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -70,8 +71,10 @@ public class Act1 extends AppCompatActivity {
             for(int j=0;j<tuple.length;j++)
             {
                 TextView tv = new TextView(getBaseContext());
-                tv.setBackgroundResource(R.drawable.ic_launcher_background);
-                tv.setPadding(1,1,1,1);
+                tv.setBackgroundResource(R.drawable.table_shape);
+                tv.setMaxHeight(200);
+                tv.setMaxWidth(400);
+                tv.setMinWidth(200);
                 tv.setText(tuple[j]);
                 tr.addView(tv);
             }
