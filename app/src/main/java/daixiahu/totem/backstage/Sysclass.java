@@ -3,7 +3,9 @@ package daixiahu.totem.backstage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+
 import java.util.Arrays;
+
 
 
 public class Sysclass {
@@ -268,5 +270,73 @@ public class Sysclass {
         }
         return tupleret;
     }
+
+    int getindex(String a, String[] b){//给下面函数服务的，得到指定字符串再字符数组中的序号
+        for(int i = 0; i < b.length; i++){
+            if (a.equals(b[i])) return i;
+        }
+        return 0;
+    }
+
+    Boolean booltest(String[] tupleattr, String attr_val, String val,String[] attr_name, String[] attr_type, int cal_type){//参数：指定的元组，符号左边（待测属性），符号右边（待测值），属性名称，属性类型，符号类型
+        Boolean flag = false;
+        int index = 0;
+        switch (cal_type){
+            case 0: //=
+                    index = getindex(attr_val, attr_name);
+                    if (attr_type[index].equals("0")){//string
+                        if (tupleattr[index].equals(val))
+                            return true;
+                    }
+                    else{//int
+                        if (Integer.parseInt(tupleattr[index]) == Integer.parseInt(val))
+                            return true;
+                    }
+                    break;
+            case 1://>
+                index = getindex(attr_val, attr_name);
+                if (Integer.parseInt(tupleattr[index]) > Integer.parseInt(val))
+                    return true;
+                break;
+            case 2://<
+                index = getindex(attr_val, attr_name);
+                if (Integer.parseInt(tupleattr[index]) < Integer.parseInt(attr_val))
+                    return true;
+                break;
+        }
+        return false;
+    }
+
+    public String  booleaneval(Context cxt, String classOid, String tupleid, String boolstr){//对where表达式子中的bool表达式求值
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String[] attr_name = looker.getString("attrReal_name", "").split("-@-");
+        String[] attr_type = looker.getString("attrReal_type", "").split("-@-");
+        String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
+        String booltmp = boolstr.replace("(", "");
+        booltmp = booltmp.replace(")", "");
+        String[] boolsplit = booltmp.split(" *(AND|OR) *");
+        int cal_type = 0;
+        for (String b: boolsplit) {
+            String[] tmp = b.split(" +");
+            switch (tmp[1]){
+                case "=":
+                    break;
+                case ">":
+                    cal_type = 1;
+                    break;
+                case "<":
+                    cal_type = 2;
+                    break;
+            }
+            if (booltest(tupleattr, tmp[0], tmp[2], attr_name, attr_type, cal_type))
+                boolstr = boolstr.replace(b, "T ");
+            else
+                boolstr = boolstr.replace(b, "F ");
+
+        }
+        return boolstr;
+    }
+
+
 
 }

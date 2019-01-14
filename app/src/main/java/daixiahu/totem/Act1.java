@@ -31,15 +31,15 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //dosth();
-                String[] s = {"张三 21 男"," 李四 30 男","王五 16 女"};
-                updateResultTable(s);
+                dosth();
+                //String[] s = {"张三 21 男","李四 30 男","王五 16 女"};
+                //updateResultTable(s);
             }
         });
 
     }
 
-    /*void dosth(){
+    void dosth(){
         Sysclass c = new Sysclass();
         c.init(this);
         String[] attr = {"sno","sex","age"};
@@ -51,16 +51,16 @@ public class Act1 extends AppCompatActivity {
         String[] tuple2 = {"xiaohong", "female", "17"};
         c.newsysclass(this, "class1", attr, type);
         //c.newsysclass(this, "class2", attr, type);
-        //c.inserttuple(this, "class1", tuple0);
-        //c.inserttuple(this, "class1", tuple1);
-        //c.inserttuple(this, "class1", tuple2);
+        c.inserttuple(this, "class1", tuple0);
+        c.inserttuple(this, "class1", tuple1);
+        c.inserttuple(this, "class1", tuple2);
         //c.deltuple(this, "0", "0");
         //c.deltuple(this, "0", "1");
-        c.newproxyclass(this, "group1", "class1", attr, attr, attrgroup, typegroup);
+        //c.newproxyclass(this, "group1", "class1", attr, attr, attrgroup, typegroup);
         //int[] t = {0,1};
         //String test = c.choosetuple(this, "0", "0", t);
-        Toast.makeText(Act1.this, "ok", Toast.LENGTH_SHORT).show();
-    }*/
+        Toast.makeText(Act1.this, c.booleaneval(this, "0", "0", "sno = xiaoming AND (sex = male) OR (age = 18)"), Toast.LENGTH_SHORT).show();
+    }
 
     void updateResultTable(String[] results)
     {
@@ -78,6 +78,7 @@ public class Act1 extends AppCompatActivity {
                 tv.setText(tuple[j]);
                 tr.addView(tv);
             }
+            result.addView(tr);
         }
     }
 
