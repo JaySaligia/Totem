@@ -104,7 +104,7 @@ public class Sysclass {
         return ret;
     }
 
-    public int inserttuple(Context cxt, String classname, String[] tuple){//插入元组
+    public int inserttuple(Context cxt, String classname, String[] tuple,int insert_type){//插入元组,insert_type为插入类型，-1为源类，其余为代理类中对象对应在源类中的id
         int tmp = getclassOid(cxt, classname);
         if ( tmp == -1)
             return -1;//该类不存在
@@ -128,6 +128,13 @@ public class Sysclass {
         }
         editor.putInt("tupleCount", Integer.parseInt(tuplecount) + 1);
         editor.apply();
+        if (insert_type >= 0){//如果是代理类，要修改连接表信息
+            String linkclassid = looker.getString("classLink", "");
+            SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + linkclassid + "-" + classOid, Context.MODE_PRIVATE).edit();
+            linkeditor.putString("src" + insert_type+"", tupleid);
+            linkeditor.putString("proxy" + tupleid, insert_type+"");
+            linkeditor.apply();
+        }
         return 1;
     }
 
@@ -266,7 +273,7 @@ public class Sysclass {
         String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
         String tupleret = "";
         for(int i = 0; i < attrid.length; i ++){
-            tupleret+= "\t" + tupleattr[attrid[i]];
+            tupleret+= tupleattr[attrid[i]] + " ";
         }
         return tupleret;
     }
@@ -300,17 +307,26 @@ public class Sysclass {
                 break;
             case 2://<
                 index = getindex(attr_val, attr_name);
-                if (Integer.parseInt(tupleattr[index]) < Integer.parseInt(attr_val))
+                if (Integer.parseInt(tupleattr[index]) < Integer.parseInt(val))
                     return true;
                 break;
         }
         return false;
     }
 
-    public String  booleaneval(Context cxt, String classOid, String tupleid, String boolstr){//对where表达式子中的bool表达式求值
+    public  String booleaneval(Context cxt, String classOid, String tupleid, String boolstr){//对where表达式子中的bool表达式求值
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
-        String[] attr_name = looker.getString("attrReal_name", "").split("-@-");
-        String[] attr_type = looker.getString("attrReal_type", "").split("-@-");
+        int class_type = looker.getInt("classType", 0);
+        String[] attr_name;
+        String[] attr_type;
+        if (class_type == 0) {
+            attr_name = looker.getString("attrReal_name", "").split("-@-");
+            attr_type = looker.getString("attrReal_type", "").split("-@-");
+        }
+        else{
+            attr_name = looker.getString("attrVirtual_name", "").split("-@-");
+            attr_type = looker.getString("attrVirtual_type", "").split("-@-");
+        }
         String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
         String booltmp = boolstr.replace("(", "");
         booltmp = booltmp.replace(")", "");
@@ -329,14 +345,75 @@ public class Sysclass {
                     break;
             }
             if (booltest(tupleattr, tmp[0], tmp[2], attr_name, attr_type, cal_type))
-                boolstr = boolstr.replace(b, "T ");
+                boolstr = boolstr.replace(b, " T ");
             else
-                boolstr = boolstr.replace(b, "F ");
+                boolstr = boolstr.replace(b, " F ");
 
         }
         return boolstr;
     }
 
+    public String[] showselecttuple(Context cxt, String classOid, String[] attr_show, String boolstr){
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+        String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
+        int tuplecount = looker.getInt("tupleCount", 0);
+        int[] attrindex = new int[attr_show.length];
+        for (int i = 0; i < attr_show.length; i++){
+            attrindex[i] = getindex(attr_show[i], attr_name);
+        }
+        String tmp = "";
+        for (int i = 0; i < attr_show.length; i ++){
+            tmp += attr_show[i] + " ";
+        }
+        tmp += "-@-";
+        for (int i = 0; i < tuplecount; i ++){
+            //if(booleaneval(cxt, classOid, i+"", boolstr))
+              //tmp += choosetuple(cxt, classOid, i+"", attrindex) + "-@-";
+        }
+        return tmp.split("-@-");
 
+    }
 
+    public String[] showalltuple(Context cxt, String classOid, String[] attr_show){
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+        String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
+        int tuplecount = looker.getInt("tupleCount", 0);
+        int[] attrindex = new int[attr_show.length];
+        for (int i = 0; i < attr_show.length; i++){
+            attrindex[i] = getindex(attr_show[i], attr_name);
+        }
+        String tmp = "";
+        for (int i = 0; i < attr_show.length; i ++){
+            tmp += attr_show[i] + " ";
+        }
+        tmp += "-@-";
+        for (int i = 0; i < tuplecount; i ++){
+             tmp += choosetuple(cxt, classOid, i+"", attrindex) + "-@-";
+        }
+        return tmp.split("-@-");
+    }
+
+    /*
+    public boolean booltest(String boolstr){//对修改完的布尔字符串求值
+        String[] boollist = boolstr.split(" *AND|OR *");
+        int index = 0;
+        int stack_i = 0;
+        int[] stack = new int[boollist.length];
+        while (true){
+            switch (boollist[index]){
+                case "T":
+                    stack[stack_i] = 1;
+                    stack_i ++;
+                    index ++;
+                case "F":
+                    stack[stack_i] = 1;
+                case "AND":
+                case "OR":
+
+            }
+        }
+    }
+    */
 }
