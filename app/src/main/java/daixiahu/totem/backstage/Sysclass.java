@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.Scanner;
+import java.util.Stack;
 
 
 public class Sysclass {
@@ -314,7 +316,7 @@ public class Sysclass {
         return false;
     }
 
-    public  String booleaneval(Context cxt, String classOid, String tupleid, String boolstr){//对where表达式子中的bool表达式求值
+    public Boolean booleaneval(Context cxt, String classOid, String tupleid, String boolstr){//对where表达式子中的bool表达式求值
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         int class_type = looker.getInt("classType", 0);
         String[] attr_name;
@@ -350,7 +352,7 @@ public class Sysclass {
                 boolstr = boolstr.replace(b, " F ");
 
         }
-        return boolstr;
+        return eval(boolstr);
     }
 
     public String[] showselecttuple(Context cxt, String classOid, String[] attr_show, String boolstr){
@@ -368,8 +370,8 @@ public class Sysclass {
         }
         tmp += "-@-";
         for (int i = 0; i < tuplecount; i ++){
-            //if(booleaneval(cxt, classOid, i+"", boolstr))
-              //tmp += choosetuple(cxt, classOid, i+"", attrindex) + "-@-";
+            if(booleaneval(cxt, classOid, i+"", boolstr))
+              tmp += choosetuple(cxt, classOid, i+"", attrindex) + "-@-";
         }
         return tmp.split("-@-");
 
@@ -395,25 +397,97 @@ public class Sysclass {
         return tmp.split("-@-");
     }
 
-    /*
-    public boolean booltest(String boolstr){//对修改完的布尔字符串求值
-        String[] boollist = boolstr.split(" *AND|OR *");
-        int index = 0;
-        int stack_i = 0;
-        int[] stack = new int[boollist.length];
-        while (true){
-            switch (boollist[index]){
-                case "T":
-                    stack[stack_i] = 1;
-                    stack_i ++;
-                    index ++;
-                case "F":
-                    stack[stack_i] = 1;
-                case "AND":
-                case "OR":
+    private ArrayList<String> infixToPostfix(ArrayList<String> infix) {
+        Stack<String> ops = new Stack<String>();
+        ArrayList<String> postfix = new ArrayList<String>();
 
+        for (String s : infix) {
+            if (s.equals("(")) {
+                ops.push(s);
+            } else if (s.equals("AND") || s.equals("OR")) {
+                if (!ops.empty() && priority(s) <= priority(ops.peek())) {
+                    while (!ops.empty() && !ops.peek().equals("(")) {
+                        postfix.add(ops.pop());
+                    }
+                    ops.push(s);
+                } else {
+                    ops.push(s);
+                }
+            } else if (s.equals(")")) {
+                while (!ops.empty()) {
+                    String v = ops.pop();
+                    if (v.equals("(")) {
+                        break;
+                    } else {
+                        postfix.add(v);
+                    }
+                }
+            } else if (s.equals("T")) {
+                postfix.add(s);
+            } else if (s.equals("F")) {
+                postfix.add(s);
             }
         }
+
+        // pop all remaining OPs in the stack
+        while (!ops.empty()) {
+            postfix.add(ops.pop());
+        }
+
+        return postfix;
     }
-    */
+
+    // Evaluate the boolean expr by postfix
+    private boolean eval(String bexpr) {
+        Stack<Boolean> vals = new Stack<Boolean>();
+        ArrayList<String> infix = new ArrayList<String>();
+        for (String s : bexpr.split(" +")) {
+            infix.add(s);
+        }
+        ArrayList<String> postfix = infixToPostfix(infix);
+
+        // debug
+        for (String s : postfix) {
+            System.out.print(s+" ");
+        }
+        System.out.println();
+
+        for (String s : postfix) {
+            if (s.equals("AND")) {
+                boolean v = vals.pop();
+                v = vals.pop() && v;
+                vals.push(v);
+            } else if (s.equals("OR")) {
+                boolean v = vals.pop();
+                v = vals.pop() || v;
+                vals.push(v);
+            } else {
+                if (s.equals("T")) {
+                    vals.push(true);
+                } else if (s.equals("F")) {
+                    vals.push(false);
+                } else {
+                    // Error
+                }
+            }
+        }
+
+        // If everything goes right, the result will be the only element in stack.
+        return vals.pop();
+    }
+
+    private int priority(String op) {
+        if (op.equals("AND")) {
+            return 2;
+        } else if (op.equals("OR")) {
+            return 1;
+        } else if (op.equals("(")) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+
+
 }
