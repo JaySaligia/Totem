@@ -37,7 +37,9 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dosth1(scanfSql.getText().toString());
+                translate(scanfSql.getText().toString());
+                //dosth1("create class name (sno int,sex string);");
+                //dosth1(scanfSql.getText().toString());
                 //dosth();
                 //String[] s = {"张三 21 男","李四 30 男","王五 16 女"};
                 //updateResultTable(s);
@@ -98,6 +100,30 @@ public class Act1 extends AppCompatActivity {
         if (test == null)
             test = "语法有错，请检查语法输入";
         Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+    }
+
+    void translate(String expr){
+        ANTLRInputStream in = new ANTLRInputStream(expr);
+        TotemLexer lexer = new TotemLexer(in);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        TotemParser parser = new TotemParser(tokens);
+
+        TotemParser.RootContext createStatementContext = parser.root();
+        String test = createStatementContext.s;
+        if (test == null) {
+            test = "语法有错，请检查语法输入";
+            Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+            Sysclass c = new Sysclass();
+            c.init(Act1.this);
+            String[] element = test.split(" *, *");
+            String id = element[0].split(" *: *")[1];
+            switch (id){
+                case "0":c.trans_newsrcclass(Act1.this, element);//新建源类
+            }
+        }
     }
 
     void updateResultTable(String[] results)

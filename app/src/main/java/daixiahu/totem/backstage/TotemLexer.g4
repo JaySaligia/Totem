@@ -1,10 +1,23 @@
 lexer grammar TotemLexer;
 
+INTO: [Ii][Nn][Tt][Oo];
+VALUES: [Vv][Aa][Ll][Uu][Ee][Ss];
+DROP: [Dd][Rr][Oo][Pp];
+CROSS: [Cc][Rr][Oo][Ss][Ss];
+DELETE: [Dd][Ee][Ll][Ee][Tt][Ee];
+INSERT: [Ii][Nn][Ss][Ee][Rr][Tt];
 CREATE: [Cc][Rr][Ee][Aa][Tt][Ee];
 CLASS: [Cc][Ll][Aa][Ss][Ss];
 ATTRTYPE:  ([Ss][Tt][Rr][Ii][Nn][Gg]) | ([Ii][Nn][Tt]);
+SELECT: [Ss][Ee][Ll][Ee][Cc][Tt];
 SELECTDEPUTY : [Ss][Ee][Ll][Ee][Cc][Tt][Dd][Ee][Pp][Uu][Tt][Yy];
+FROM: [Ff][Rr][Oo][Mm];
+WHERE: [Ww][Hh][Ee][Rr][Ee];
+AS: [Aa][Ss];
+AND: [Aa][Nn][Dd];
+OR: [Oo][Rr];
 NAME: [A-Za-z0-9]+;
+COND: ([A-Za-z0-9]+[=][A-Za-z0-9]+) | ([A-Za-z0-9]+[<>][0-9]+);
 LR_BARCKET: '(';
 RR_BARCKET: ')';
 COMMA: ',';

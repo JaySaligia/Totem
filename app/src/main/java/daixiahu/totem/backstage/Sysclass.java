@@ -488,6 +488,32 @@ public class Sysclass {
         }
     }
 
+    //最上层的接口
+    public int trans_newsrcclass(Context cxt, String[] element){
+        String classname = "";
+        String[] attr_name = new String[10];
+        int[] attr_type = new int[10];
+        for (int i = 1; i < element.length; i ++){
+            String[] direct = element[i].split(" *: *");
+            switch (direct[0]){
+                case "classname":
+                    classname = direct[1];
+                case "attr":
+                     attr_name = direct[1].substring(0, direct[1].length()-3).split("-@-");
+                case "type":
+                    String[] typestr = direct[1].toLowerCase().split("-@-");
+                    attr_type = new int[typestr.length];
+                    for (int index = 0 ;index < typestr.length; index++) {
+                        if (typestr[index].equals("int"))
+                            attr_type[index] = 1;
+                        else
+                            attr_type[index] = 0;
+                    }
+            }
+        }
+        newsysclass(cxt, classname, attr_name, attr_type);
+        return 1;
+    }
 
 
 }
