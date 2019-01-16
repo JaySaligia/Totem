@@ -515,5 +515,12 @@ public class Sysclass {
         return 1;
     }
 
+    public int trans_inserttuple(Context cxt, String[] element){
+        String[] direct = element[1].split(" *: *");
+        String classname = direct[1];
+        String[] tuple= element[2].split(" *: *")[1].split("-@-");
+        inserttuple(cxt, classname, tuple, -1);
+        return 1;
+    }
 
 }

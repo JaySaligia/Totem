@@ -37,8 +37,14 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                translate(scanfSql.getText().toString());
-                //dosth1("create class name (sno int,sex string);");
+                //translate(scanfSql.getText().toString());
+                init();
+                translate("create class class1 (sname string, sex string, age int)");
+                translate("insert into class1 values (xiaoming, male,18);");
+                translate("insert into class1 values (xiaohong, female,18);");
+                translate("insert into class1 values (xiaogang, male,19);");
+                translate("insert into class1 values (xiaolv, female,17);");
+                //dosth1("insert into classname values (1,2,3);");
                 //dosth1(scanfSql.getText().toString());
                 //dosth();
                 //String[] s = {"张三 21 男","李四 30 男","王五 16 女"};
@@ -47,6 +53,12 @@ public class Act1 extends AppCompatActivity {
         });
 
     }
+
+    void init(){
+        Sysclass c = new Sysclass();
+        c.init(this);
+    }
+
 
     void dosth(){
         Sysclass c = new Sysclass();
@@ -117,11 +129,11 @@ public class Act1 extends AppCompatActivity {
         else{
             Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
             Sysclass c = new Sysclass();
-            c.init(Act1.this);
             String[] element = test.split(" *, *");
             String id = element[0].split(" *: *")[1];
             switch (id){
                 case "0":c.trans_newsrcclass(Act1.this, element);//新建源类
+                case "2":c.trans_inserttuple(Act1.this, element);//插入对象
             }
         }
     }

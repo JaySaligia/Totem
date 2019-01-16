@@ -30,7 +30,7 @@ createDeputyStatement returns [String s]//1
 
 insertStatement returns [String s]//2
     locals[String ret = ""]
-    :INSERT INTO NAME{$ret += "id:2,classname:" + $NAME.text + ",";} VALUES LR_BARCKET (NAME COMMA{$ret += "attr:" + $NAME.text + ",";})* NAME{$ret += "attr:" + $NAME.text;} RR_BARCKET SEMI {$s = $ret;}
+    :INSERT INTO NAME{$ret += "id:2,classname:" + $NAME.text + ",attr:";} VALUES LR_BARCKET (NAME COMMA{$ret += $NAME.text + "-@-";})* NAME{$ret += $NAME.text;} RR_BARCKET SEMI {$s = $ret;}
     ;
 
 dropTableStatement returns [String s]
