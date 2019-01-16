@@ -44,9 +44,17 @@ deleteStatement returns [String s]
     ;
 
 selectStatement returns [String s]
-    :SELECT NAME (COMMA NAME)* FROM NAME WHERE whereStatement
-    |SELECT NAME (CROSS NAME)+ FROM NAME WHERE whereStatement
+    locals[String ret = ""]
+    :SELECT {$ret += "id:5," + "attr:";}(NAME COMMA {$ret += $NAME.text + "-@-";})* NAME {$ret += $NAME.text + ",";}
+     FROM NAME {$ret += "classname:" + $NAME.text + ",";}
+     WHERE whereStatement {$ret += "cond:" + $whereStatement.s;}
+     SEMI {$s = $ret;}
+    |SELECT NAME CROSS {$ret += "id:6,";} NAME {$ret += $NAME.text + ",";} (CROSS NAME {$ret += $NAME.text + ",";})*
+     FROM NAME {$ret += "classname:" + $NAME.text + ",";}
+     WHERE whereStatement {$ret += "cond:" + $whereStatement.s;}
+     SEMI {$s = $ret;}
     ;
+
 
 /*
 whereStatement returns [String s]
@@ -59,7 +67,7 @@ whereStatement returns [String s]
 */
 whereStatement  returns [String s]
     :COND whereStatementplus{$s = $COND.text + $whereStatementplus.s;}
-    |LR_BARCKET whereStatement RR_BARCKET whereStatementplus{$s = "( " + $whereStatement.s + $whereStatementplus.s + " )";}
+    |LR_BARCKET whereStatement RR_BARCKET whereStatementplus{$s = "(" + $whereStatement.s + $whereStatementplus.s + ")";}
     ;
 
 whereStatementplus returns [String s]
@@ -68,7 +76,7 @@ whereStatementplus returns [String s]
     ;
 
 whereStatementdivide returns [String s]
-    :AND whereStatement {$s = "AND" + $whereStatement.s;}
-    |OR whereStatement {$s = "OR" + $whereStatement.s;}
+    :AND whereStatement {$s = " AND " + $whereStatement.s;}
+    |OR whereStatement {$s = " OR " + $whereStatement.s;}
     ;
 

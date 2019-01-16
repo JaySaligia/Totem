@@ -44,7 +44,8 @@ public class Act1 extends AppCompatActivity {
                 translate("insert into class1 values (xiaohong, female,18);");
                 translate("insert into class1 values (xiaogang, male,19);");
                 translate("insert into class1 values (xiaolv, female,17);");
-                //dosth1("insert into classname values (1,2,3);");
+                translate("select sname, sex from class1 where (sex=female OR sname=xiaoming) AND age>17;");
+                //dosth1("select sno, sex from class1 where sno=xiaolv OR (age=18);");
                 //dosth1(scanfSql.getText().toString());
                 //dosth();
                 //String[] s = {"张三 21 男","李四 30 男","王五 16 女"};
@@ -96,7 +97,7 @@ public class Act1 extends AppCompatActivity {
         //c.inserttuple(this, "group1", tuple2, 2);
         //int[] t = {0,1};
         //String test = c.choosetuple(this, "0", "0", t);
-        String[] strings = c.showselecttuple(this, "0", attr_1, "(sno = xiaohong3 OR sex = male) AND age > 18");
+        String[] strings = c.showselecttuple(this, "0", attr_1, "age=18");
         updateResultTable(strings);
         Toast.makeText(Act1.this, "tttt", Toast.LENGTH_SHORT).show();
     }
@@ -132,14 +133,16 @@ public class Act1 extends AppCompatActivity {
             String[] element = test.split(" *, *");
             String id = element[0].split(" *: *")[1];
             switch (id){
-                case "0":c.trans_newsrcclass(Act1.this, element);//新建源类
-                case "2":c.trans_inserttuple(Act1.this, element);//插入对象
+                case "0":c.trans_newsrcclass(Act1.this, element);break;//新建源类
+                case "2":c.trans_inserttuple(Act1.this, element);break;//插入对象
+                case "5":updateResultTable(c.trans_selecttuple(Act1.this, element));break;//选择特定对象
             }
         }
     }
 
     void updateResultTable(String[] results)
     {
+        //result.removeAllViews();
         for(int i = 0;i<results.length;i++)
         {
             String[] tuple = results[i].split(" ");

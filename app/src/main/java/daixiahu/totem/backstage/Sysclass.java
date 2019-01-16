@@ -335,8 +335,18 @@ public class Sysclass {
         String[] boolsplit = booltmp.split(" *(AND|OR) *");
         int cal_type = 0;
         for (String b: boolsplit) {
-            String[] tmp = b.split(" +");
-            switch (tmp[1]){
+            String[] tmp;
+            if (b.contains("="))
+                tmp = b.split(" *= *");
+            else if (b.contains(">")){
+                tmp = b.split(" *> *");
+                cal_type = 1;
+            }
+            else {
+                tmp = b.split(" *< *");
+                cal_type = 2;
+            }
+           /* switch (tmp[1]){
                 case "=":
                     break;
                 case ">":
@@ -345,13 +355,16 @@ public class Sysclass {
                 case "<":
                     cal_type = 2;
                     break;
-            }
-            if (booltest(tupleattr, tmp[0], tmp[2], attr_name, attr_type, cal_type))
+            }*/
+            if (booltest(tupleattr, tmp[0], tmp[1], attr_name, attr_type, cal_type))
                 boolstr = boolstr.replace(b, " T ");
             else
                 boolstr = boolstr.replace(b, " F ");
 
         }
+        SharedPreferences.Editor editor = cxt.getSharedPreferences("sadsdadasd", Context.MODE_PRIVATE).edit();
+        editor.putString("dada",boolstr);
+        editor.apply();
         return eval(boolstr);
     }
 
@@ -489,7 +502,7 @@ public class Sysclass {
     }
 
     //最上层的接口
-    public int trans_newsrcclass(Context cxt, String[] element){
+    public int trans_newsrcclass(Context cxt, String[] element){//新建源类
         String classname = "";
         String[] attr_name = new String[10];
         int[] attr_type = new int[10];
@@ -515,12 +528,22 @@ public class Sysclass {
         return 1;
     }
 
-    public int trans_inserttuple(Context cxt, String[] element){
+    public int trans_inserttuple(Context cxt, String[] element){//源类插入元组
         String[] direct = element[1].split(" *: *");
         String classname = direct[1];
         String[] tuple= element[2].split(" *: *")[1].split("-@-");
         inserttuple(cxt, classname, tuple, -1);
         return 1;
     }
+
+    public String[] trans_selecttuple(Context cxt, String[] element){//选择元组
+        String[] direct = element[2].split(" *: *");
+        String classOid = getclassOid(cxt, direct[1])+"";
+        String[] attr = element[1].split(" *: *")[1].split("-@-");
+        String cond = element[3].split(" *: *")[1];
+        return showselecttuple(cxt, classOid, attr, cond);
+
+    }
+
 
 }
