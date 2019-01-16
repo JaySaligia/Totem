@@ -40,7 +40,7 @@ deleteStatement returns [String s]//3
 
 dropTableStatement returns [String s]//4
     locals[String ret = ""]
-    :DROP CLASS NAME{$ret += "id:4,classname:" + $NAME.text + ",";} SEMI {$s = $ret;}
+    :DROP CLASS NAME{$ret += "id:4,classname:" + $NAME.text;} SEMI {$s = $ret;}
     ;
 
 

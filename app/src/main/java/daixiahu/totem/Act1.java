@@ -47,6 +47,7 @@ public class Act1 extends AppCompatActivity {
                 //translate("select sname, sex from class1 where (sex=female OR sname=xiaoming) AND age>17;");
                 translate("delete from class1 where sname=xiaolv OR sex=male;");
                 translate("insert into class1 values (xiaogang, male,19);");
+                translate("drop class class1;");
                 //dosth1(" delete from class1 where sname=xiaolv;");
                 //dosth1(scanfSql.getText().toString());
                 //dosth();
@@ -138,6 +139,7 @@ public class Act1 extends AppCompatActivity {
                 case "0":c.trans_newsrcclass(Act1.this, element);break;//新建源类
                 case "2":c.trans_inserttuple(Act1.this, element);break;//插入对象
                 case "3":c.trans_deletetuple(Act1.this, element);break;//删除对象
+                case "4":c.trans_deleteclass(Act1.this, element);break;//删除类
                 case "5":updateResultTable(c.trans_selecttuple(Act1.this, element));break;//选择特定对象
             }
         }

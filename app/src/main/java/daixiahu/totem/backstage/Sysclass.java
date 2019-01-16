@@ -247,18 +247,26 @@ public class Sysclass {
         return 1;
     }
 
-    public int delsrcclass(Context cxt, String classname){//删除源类
+    public int delclass(Context cxt, String classname){//删除源类
         String classOid = getclassOid(cxt, classname)+"";
+
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+
         String[] link = looker.getString("classLink","").split("-@-");//获取link信息
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
-        for (int i = 0; i< link.length; i++){
-            SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
-            linkeditor.clear();
-            linkeditor.apply();
-            SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
-            proxyeditor.clear();
-            proxyeditor.apply();
+        if (classtype == 0) {
+            if (!link[0].equals("")) {
+                for (int i = 0; i < link.length; i++) {
+                    SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
+                    linkeditor.clear();
+                    linkeditor.apply();
+                    SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
+                    proxyeditor.clear();
+                    proxyeditor.apply();
+                }
+
+            }
         }
         editor.clear();//清空源类
         editor.apply();
@@ -564,5 +572,10 @@ public class Sysclass {
         return 1;
     }
 
+    public int trans_deleteclass(Context cxt, String[] element){
+        String[] direct = element[1].split(" *: *");
+        delclass(cxt, direct[1]);
+        return 1;
+    }
 
 }
