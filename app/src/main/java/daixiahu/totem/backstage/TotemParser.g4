@@ -33,15 +33,16 @@ insertStatement returns [String s]//2
     :INSERT INTO NAME{$ret += "id:2,classname:" + $NAME.text + ",attr:";} VALUES LR_BARCKET (NAME COMMA{$ret += $NAME.text + "-@-";})* NAME{$ret += $NAME.text;} RR_BARCKET SEMI {$s = $ret;}
     ;
 
-dropTableStatement returns [String s]
+deleteStatement returns [String s]//3
     locals[String ret = ""]
-    :DROP CLASS NAME{} SEMI
+    :DELETE FROM NAME{$ret += "id:3,classname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s;} SEMI {$s = $ret;}
     ;
 
-deleteStatement returns [String s]
+dropTableStatement returns [String s]//4
     locals[String ret = ""]
-    :DELETE FROM NAME{} WHERE whereStatement
+    :DROP CLASS NAME{$ret += "id:4,classname:" + $NAME.text + ",";} SEMI {$s = $ret;}
     ;
+
 
 selectStatement returns [String s]
     locals[String ret = ""]

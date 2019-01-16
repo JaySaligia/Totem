@@ -118,17 +118,19 @@ public class Sysclass {
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         String tuplestr = makestr_s(tuple);
         editor.putString("tuple" + tupleid, tuplestr);//新建键值对来储存元组
-        if (tupleava[0].equals(tuplecount)){//没有墓碑id
+        if (tupleava.length == 1){//没有墓碑id
             editor.putString("tupleAva", (Integer.parseInt(tupleava[0]) + 1)+"");
+            editor.putInt("tupleCount", Integer.parseInt(tuplecount) + 1);
         }
         else
         {
             String tupleavanew = "";
             for (int i = 1; i< tupleava.length; i ++){
                 tupleavanew += (i == tupleava.length - 1)?tupleava[i]:tupleava[i] + "-@-";//形如"1-@-2-@-3"
+                editor.putString("tupleAva", tupleavanew);
             }
         }
-        editor.putInt("tupleCount", Integer.parseInt(tuplecount) + 1);
+
         editor.apply();
         if (insert_type >= 0){//如果是代理类，要修改连接表信息
             String linkclassid = looker.getString("classLink", "");
@@ -217,7 +219,7 @@ public class Sysclass {
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         editor.remove("tuple" + tuplenum);//从源类删除对象
         editor.putString("tupleAva", tuplenum + "-@-" + tupleava);//增加墓碑元组id
-        editor.putInt("tupleCount", tuplecount - 1);//元组总数-1
+        //editor.putInt("tupleCount", tuplecount - 1);//元组总数-1
         editor.apply();
         //删除link表中的元素和对应代理类中的代理对象
         if (link[0].equals(""))
@@ -362,9 +364,7 @@ public class Sysclass {
                 boolstr = boolstr.replace(b, " F ");
 
         }
-        SharedPreferences.Editor editor = cxt.getSharedPreferences("sadsdadasd", Context.MODE_PRIVATE).edit();
-        editor.putString("dada",boolstr);
-        editor.apply();
+
         return eval(boolstr);
     }
 
@@ -388,6 +388,17 @@ public class Sysclass {
         }
         return tmp.split("-@-");
 
+    }
+
+    public int delselecttuple(Context cxt, String classOid, String boolstr){
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+        int tuplecount = looker.getInt("tupleCount", 0);
+        for (int i = 0; i < tuplecount; i ++){
+            if(booleaneval(cxt, classOid, i+"", boolstr))
+                deltuple(cxt, classOid, i+"");
+        }
+        return 1;
     }
 
     public String[] showalltuple(Context cxt, String classOid, String[] attr_show){
@@ -543,6 +554,14 @@ public class Sysclass {
         String cond = element[3].split(" *: *")[1];
         return showselecttuple(cxt, classOid, attr, cond);
 
+    }
+
+    public int trans_deletetuple(Context cxt, String[] element){//删除元组
+        String[] direct = element[1].split(" *: *");
+        String classOid = getclassOid(cxt, direct[1])+"";
+        String cond = element[2].split(" *: *")[1];
+        delselecttuple(cxt, classOid, cond);
+        return 1;
     }
 
 
