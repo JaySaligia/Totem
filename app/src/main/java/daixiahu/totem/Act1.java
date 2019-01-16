@@ -37,8 +37,8 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //dosth1(scanfSql.getText().toString());
-                dosth();
+                dosth1(scanfSql.getText().toString());
+                //dosth();
                 //String[] s = {"张三 21 男","李四 30 男","王五 16 女"};
                 //updateResultTable(s);
             }
@@ -93,8 +93,10 @@ public class Act1 extends AppCompatActivity {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TotemParser parser = new TotemParser(tokens);
 
-        TotemParser.CreateStatementContext createStatementContext = parser.createStatement();
+        TotemParser.RootContext createStatementContext = parser.root();
         String test = createStatementContext.s;
+        if (test == null)
+            test = "语法有错，请检查语法输入";
         Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
     }
 
