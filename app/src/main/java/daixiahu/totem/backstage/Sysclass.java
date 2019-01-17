@@ -382,8 +382,10 @@ public class Sysclass {
         int cal_type = 0;
         for (String b: boolsplit) {
             String[] tmp;
-            if (b.contains("="))
+            if (b.contains("=")) {
                 tmp = b.split(" *= *");
+                cal_type = 0;
+            }
             else if (b.contains(">")){
                 tmp = b.split(" *> *");
                 cal_type = 1;
@@ -489,15 +491,16 @@ public class Sysclass {
 
         String[] tuplegroup = tuple.split("-@-");//得到了在起点符合要求的元组
 
+        String newclassid = getclassOid(cxt, crosspath[crosspath.length-1])+"";
         SharedPreferences targetlooker = cxt.getSharedPreferences("sysclass" + getclassOid(cxt,crosspath[crosspath.length-1])+"", Context.MODE_PRIVATE);
         int classtype = targetlooker.getInt("classType", 0);
         String[] attr_name = (classtype == 0)?targetlooker.getString("attrReal_name", "").split("-@-"):targetlooker.getString("attrVirtual_name","").split("-@-");
         String temp = attr;
-        temp += "-@-";
+        //temp += "-@-";
         int[] attrindex = new int[1];
         attrindex[0] = getindex(attr,attr_name);
         for (int i = 0; i < tuplegroup.length; i ++){
-                temp += choosetuple(cxt, classOid, i+"", attrindex) + "-@-";
+                temp += "-@-" + choosetuple(cxt, newclassid, tuplegroup[i], attrindex);
         }
         return temp.split("-@-");
 

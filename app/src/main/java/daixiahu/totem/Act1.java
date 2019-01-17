@@ -38,31 +38,9 @@ public class Act1 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //translate(scanfSql.getText().toString());
-                init();
-                translate("create class class1 (sname string, sex string, age int, grade int);");
-                translate("insert into class1 values (xiaoming, male,18,43);");
-                translate("insert into class1 values (xiaohong, female,18,23);");
-                translate("insert into class1 values (xiaogang, male,19,31);");
-                translate("insert into class1 values (xiaolv, female,17,77);");
-                translate("insert into class1 values (xiaojie, female,18,88);");
-                translate("insert into class1 values (xiaoeee, female,18,90);");
-                translate("insert into class1 values (xiaobaji, male,19,11);");
-                translate("insert into class1 values (xiaodada, female,17,62);");
-                //translate("select sname, sex from class1 where (sex=female OR sname=xiaoming) AND age>17;");
-                //translate("delete from class1 where sname=xiaolv OR sex=male;");
-                //translate("insert into class1 values (xiaogang, male,19);");
-                //translate("drop class class1;");
-                translate("create selectdeputy goodstu select sname as name, sex as xingbie from class1 where grade>60;");
-                //translate("select name from goodstu where xingbie=female");
-                translate("select goodstu -> class1.sex from goodstu where xingbie=female;");
-                //dosth1(" delete from class1 where sname=xiaolv;");
-                //dosth1(scanfSql.getText().toString());
-                //dosth();
-                //String[] s = {"张三 21 男","李四 30 男","王五 16 女"};
-                //updateResultTable(s);
+                testsql();
             }
         });
-
     }
 
     void init(){
@@ -70,12 +48,34 @@ public class Act1 extends AppCompatActivity {
         c.init(this);
     }
 
+    void testsql(){
+        init();
+        translate("create class class1 (sno int,sname string, sex string, age int, grade int);");
+        translate("insert into class1 values (1, Alice, male, 22, 100);");
+        translate("insert into class1 values (2, Bob, female, 21, 90);");
+        translate("insert into class1 values (3, Carolu, female, 22, 55);");
+        translate("insert into class1 values (4, Dogge, male, 24, 83);");
+        translate("insert into class1 values (5, Ellen, female, 21, 84);");
+        translate("insert into class1 values (6, Frank, male, 20, 48);");
+        translate("insert into class1 values (7, Garen, female, 23, 78);");
+        translate("insert into class1 values (8, Hasee, male, 21, 92);");
+        translate("insert into class1 values (9, Ice, female, 24, 50);");
+        translate("insert into class1 values (10, Jason, male, 22, 77);");
+        translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=male;");
+        translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=female;");
+        translate("select num, goal from malegoodstu where goal>85 OR num>5;");
+        translate("select num, goal from malegoodstu where goal>80;");
+        translate("delete from class1 where sname=Hasee;");
+        translate("select num, goal from malegoodstu where goal>80;");
+        translate("select femalegoodstu->class1.sname from femalegoodstu where goal>80;");
+        translate("drop class class1;");
+    }
+
     void translate(String expr){
         ANTLRInputStream in = new ANTLRInputStream(expr);
         TotemLexer lexer = new TotemLexer(in);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TotemParser parser = new TotemParser(tokens);
-
         TotemParser.RootContext createStatementContext = parser.root();
         String test = createStatementContext.s;
         if (test == null) {
@@ -87,16 +87,17 @@ public class Act1 extends AppCompatActivity {
             Sysclass c = new Sysclass();
             String[] element = test.split(" *, *");
             String id = element[0].split(" *: *")[1];
+            String showmsg = "";
             switch (id){
-                case "0":c.trans_newsrcclass(Act1.this, element);break;//新建源类
-                case "1":c.trans_newdeputyclass(Act1.this, element);break;//新建代理类
-                case "2":c.trans_inserttuple(Act1.this, element);break;//插入对象
-                case "3":c.trans_deletetuple(Act1.this, element);break;//删除对象
-                case "4":c.trans_deleteclass(Act1.this, element);break;//删除类
-                case "5":updateResultTable(c.trans_selecttuple(Act1.this, element));break;//选择特定对象
-                case "6":updateResultTable(c.trans_selectdeputytuple(Act1.this, element));break;//跨类查询
+                case "0":c.trans_newsrcclass(Act1.this, element);showmsg = "新建源类成功";break;//新建源类
+                case "1":c.trans_newdeputyclass(Act1.this, element);showmsg = "新建代理类成功";break;//新建代理类
+                case "2":c.trans_inserttuple(Act1.this, element);showmsg = "插入对象成功";break;//插入对象
+                case "3":c.trans_deletetuple(Act1.this, element);showmsg = "删除对象成功";break;//删除对象
+                case "4":c.trans_deleteclass(Act1.this, element);showmsg = "删除类成功";break;//删除类
+                case "5":updateResultTable(c.trans_selecttuple(Act1.this, element));showmsg = "选择对象成功";break;//选择特定对象
+                case "6":updateResultTable(c.trans_selectdeputytuple(Act1.this, element));showmsg = "跨类查询成功";break;//跨类查询
             }
-            Toast.makeText(Act1.this, "ok", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Act1.this, showmsg, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,9 +121,4 @@ public class Act1 extends AppCompatActivity {
             result.addView(tr);
         }
     }
-
-
-
-
-
 }
