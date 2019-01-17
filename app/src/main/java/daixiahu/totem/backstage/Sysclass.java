@@ -488,10 +488,10 @@ public class Sysclass {
         }
 
         String[] tuplegroup = tuple.split("-@-");//得到了在起点符合要求的元组
-        
+
         SharedPreferences targetlooker = cxt.getSharedPreferences("sysclass" + getclassOid(cxt,crosspath[crosspath.length-1])+"", Context.MODE_PRIVATE);
-        int classtype = looker.getInt("classType", 0);
-        String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
+        int classtype = targetlooker.getInt("classType", 0);
+        String[] attr_name = (classtype == 0)?targetlooker.getString("attrReal_name", "").split("-@-"):targetlooker.getString("attrVirtual_name","").split("-@-");
         String temp = attr;
         temp += "-@-";
         int[] attrindex = new int[1];
@@ -701,8 +701,6 @@ public class Sysclass {
         String attr = element[2].split(" *: *")[1];
         String classname = element[3].split(" *: *")[1];
         String cond = element[4].split(" *: *")[1];
-
-
         return showcrosstuple(cxt, classname, cond, attr, crosspath);
     }
 

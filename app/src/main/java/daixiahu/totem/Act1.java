@@ -54,7 +54,7 @@ public class Act1 extends AppCompatActivity {
                 //translate("drop class class1;");
                 translate("create selectdeputy goodstu select sname as name, sex as xingbie from class1 where grade>60;");
                 //translate("select name from goodstu where xingbie=female");
-                translate("select goodstu -> class1.sname from goodstu where xingbie=female;");
+                translate("select goodstu -> class1.sex from goodstu where xingbie=female;");
                 //dosth1(" delete from class1 where sname=xiaolv;");
                 //dosth1(scanfSql.getText().toString());
                 //dosth();
@@ -83,7 +83,7 @@ public class Act1 extends AppCompatActivity {
             Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
             Sysclass c = new Sysclass();
             String[] element = test.split(" *, *");
             String id = element[0].split(" *: *")[1];
@@ -96,6 +96,7 @@ public class Act1 extends AppCompatActivity {
                 case "5":updateResultTable(c.trans_selecttuple(Act1.this, element));break;//选择特定对象
                 case "6":updateResultTable(c.trans_selectdeputytuple(Act1.this, element));break;//跨类查询
             }
+            Toast.makeText(Act1.this, "ok", Toast.LENGTH_SHORT).show();
         }
     }
 
