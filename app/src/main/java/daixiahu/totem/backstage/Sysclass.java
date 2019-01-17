@@ -133,7 +133,6 @@ public class Sysclass {
 
         editor.apply();
         if (insert_type >= 0){//如果是代理类，要修改连接表信息
-
             String linkclassid = looker.getString("classLink", "");
             SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + linkclassid + "-" + classOid, Context.MODE_PRIVATE).edit();
             linkeditor.putString("src" + insert_type+"", tupleid);
@@ -197,7 +196,7 @@ public class Sysclass {
         return 1;
     }
 
-    /*
+    /*考虑实属性
     public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String[] attr_r, int type_r[]){
         String classOid = getid(cxt);
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
@@ -425,6 +424,8 @@ public class Sysclass {
         return 1;
     }
 
+
+
     public String[] showselecttuple(Context cxt, String classOid, String[] attr_show, String boolstr){
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         int classtype = looker.getInt("classType", 0);
@@ -446,6 +447,62 @@ public class Sysclass {
         return tmp.split("-@-");
 
     }
+
+    int getclasstype(Context cxt, String classname){
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + getclassOid(cxt, classname)+"", Context.MODE_PRIVATE);
+        return looker.getInt("classType",0);
+    }
+
+    String docrossselect(Context cxt,String[] crosspath,String tupleid) {
+        String ret;
+        int classtype = getclasstype(cxt, crosspath[0]);
+        if (classtype == 0) {//起点是源类
+            SharedPreferences linklooker = cxt.getSharedPreferences("linkclass" + getclassOid(cxt, crosspath[0]) + "" + "-" + getclassOid(cxt, crosspath[1] + ""), Context.MODE_PRIVATE);
+            ret = linklooker.getString("src" + tupleid,"none");
+            }
+            else {//起点是代理类
+            SharedPreferences linklooker = cxt.getSharedPreferences("linkclass" + getclassOid(cxt, crosspath[1]) + "" + "-" + getclassOid(cxt, crosspath[0] + ""), Context.MODE_PRIVATE);
+            ret = linklooker.getString("proxy" + tupleid,"none");
+        }
+        if (crosspath.length > 2){
+            SharedPreferences linklooker = cxt.getSharedPreferences("linkclass" + getclassOid(cxt, crosspath[1]) + "" + "-" + getclassOid(cxt, crosspath[2] + ""), Context.MODE_PRIVATE);
+            ret = linklooker.getString("src" + tupleid,"none");
+
+        }
+            return ret;
+        }
+
+
+    String[] showcrosstuple(Context cxt, String classname,String boolstr,String attr,String[] crosspath){
+        String tuple = "";
+        String classOid = getclassOid(cxt, classname)+"";
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int tuplecount = looker.getInt("tupleCount", 0);
+        for (int i = 0; i < tuplecount; i ++){
+            if(booleaneval(cxt, classOid, i+"", boolstr)) {
+                 String tmp = docrossselect(cxt, crosspath, i + "");
+                 if(!tmp.equals("none"))
+                    tuple += tmp + "-@-";
+                    //tuple += i+"" + "-@-";
+            }
+        }
+
+        String[] tuplegroup = tuple.split("-@-");//得到了在起点符合要求的元组
+        
+        SharedPreferences targetlooker = cxt.getSharedPreferences("sysclass" + getclassOid(cxt,crosspath[crosspath.length-1])+"", Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+        String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
+        String temp = attr;
+        temp += "-@-";
+        int[] attrindex = new int[1];
+        attrindex[0] = getindex(attr,attr_name);
+        for (int i = 0; i < tuplegroup.length; i ++){
+                temp += choosetuple(cxt, classOid, i+"", attrindex) + "-@-";
+        }
+        return temp.split("-@-");
+
+    }
+
 
     public int delselecttuple(Context cxt, String classOid, String boolstr){
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
@@ -637,6 +694,16 @@ public class Sysclass {
         String[] attr_deputy = tmp.split("-@-");
         newproxyclass(cxt,classname,srcclassname,attr_src,attr_deputy,cond);
         return 1;
+    }
+
+    public String[] trans_selectdeputytuple(Context cxt, String[] element){//跨类查询
+        String[] crosspath = element[1].split(" *: *")[1].split("-@-");
+        String attr = element[2].split(" *: *")[1];
+        String classname = element[3].split(" *: *")[1];
+        String cond = element[4].split(" *: *")[1];
+
+
+        return showcrosstuple(cxt, classname, cond, attr, crosspath);
     }
 
 }

@@ -50,7 +50,7 @@ selectStatement returns [String s]
      FROM NAME {$ret += "classname:" + $NAME.text + ",";}
      WHERE whereStatement {$ret += "cond:" + $whereStatement.s.replace("null","");}
      SEMI {$s = $ret;}
-    |SELECT NAME CROSS {$ret += "id:6,";} NAME {$ret += $NAME.text + ",";} (CROSS NAME {$ret += $NAME.text + ",";})*
+    |SELECT NAME CROSS {$ret += "id:6,"+ "crosspath:"+ $NAME.text;} NAME {$ret += "-@-" + $NAME.text;} (CROSS NAME {$ret += "-@-" + $NAME.text;})*  DOT NAME{ $ret += "," + "attr:" + $NAME.text + ",";}
      FROM NAME {$ret += "classname:" + $NAME.text + ",";}
      WHERE whereStatement {$ret += "cond:" + $whereStatement.s.replace("null","");}
      SEMI {$s = $ret;}
