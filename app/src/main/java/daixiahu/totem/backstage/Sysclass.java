@@ -133,6 +133,7 @@ public class Sysclass {
 
         editor.apply();
         if (insert_type >= 0){//如果是代理类，要修改连接表信息
+
             String linkclassid = looker.getString("classLink", "");
             SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + linkclassid + "-" + classOid, Context.MODE_PRIVATE).edit();
             linkeditor.putString("src" + insert_type+"", tupleid);
@@ -171,6 +172,32 @@ public class Sysclass {
         return makestr_s(type_v);
     }
 
+    public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String boolstr){
+        String classOid = getid(cxt);
+        String sysclassOid = getclassOid(cxt, sysclassname)+"";
+        int attrlen_v = attr_v.length;
+        createlinkclass(cxt, sysclassOid, classOid, makestr_s(attr_v));
+        SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
+        editor.putString("classOid",classOid);
+        editor.putString("className", classname);
+        editor.putInt("classType", 1);
+        editor.putString("classLink", sysclassOid);//link到源类的id
+        //虚属性
+        editor.putInt("attrVirtual_num", attrlen_v);
+        String attrVirtual_name = makestr_s(attr_rename);
+        editor.putString("attrVirtual_name", attrVirtual_name);
+        //String attrVirtual_type = makestr_i(type_v);
+        editor.putString("attrVirtual_type", getsrctype(cxt, sysclassOid, attr_v));
+        editor.putString("tupleAva","0");
+        editor.putInt("tupleCount", 0);
+        editor.apply();
+        updatesystotal(cxt);
+        insertdeputy(cxt,sysclassOid,classname,attr_v, boolstr);
+
+        return 1;
+    }
+
+    /*
     public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String[] attr_r, int type_r[]){
         String classOid = getid(cxt);
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
@@ -179,9 +206,7 @@ public class Sysclass {
         editor.putInt("classType", 1);
         String sysclassOid = getclassOid(cxt, sysclassname)+"";
         editor.putString("classLink", sysclassOid);//link到源类的id
-        /*
-        建立link类
-        */
+
         int attrlen_v = attr_v.length;
         int attrlen_r = attr_r.length;
         //虚属性
@@ -210,6 +235,7 @@ public class Sysclass {
         updatesystotal(cxt);
         return 1;
     }
+    */
     public int deltuple(Context cxt, String classOid, String tuplenum){
         //删除源类的元组
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
@@ -280,6 +306,17 @@ public class Sysclass {
         syseditor.apply();
         return 1;
     }
+
+    public String choosedeputytuple(Context cxt, String classOid, String tupleid,int[] attrid){//给代理类选择特定元组
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
+        String tupleret = "";
+        for(int i = 0; i < attrid.length; i ++){
+            tupleret+= tupleattr[attrid[i]] + "-@-";
+        }
+        return tupleret.substring(0, tupleret.length()-3);
+    }
+
     public String choosetuple(Context cxt, String classOid, String tupleid,int[] attrid){//选择特定元组
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
@@ -356,16 +393,7 @@ public class Sysclass {
                 tmp = b.split(" *< *");
                 cal_type = 2;
             }
-           /* switch (tmp[1]){
-                case "=":
-                    break;
-                case ">":
-                    cal_type = 1;
-                    break;
-                case "<":
-                    cal_type = 2;
-                    break;
-            }*/
+
             if (booltest(tupleattr, tmp[0], tmp[1], attr_name, attr_type, cal_type))
                 boolstr = boolstr.replace(b, " T ");
             else
@@ -374,6 +402,27 @@ public class Sysclass {
         }
 
         return eval(boolstr);
+    }
+
+    int insertdeputy(Context cxt, String classOid, String proxyclassname, String[] attr_src, String boolstr){
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+        String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
+        int tuplecount = looker.getInt("tupleCount", 0);
+        int[] attrindex = new int[attr_src.length];
+        for (int i = 0; i < attr_src.length; i++){
+            attrindex[i] = getindex(attr_src[i], attr_name);
+        }
+        String tmp = "";
+
+        for (int i = 0; i < tuplecount; i ++){
+            if(booleaneval(cxt, classOid, i+"", boolstr)) {
+                tmp = choosedeputytuple(cxt, classOid, i + "", attrindex);
+                String[] tmpstr = tmp.split("-@-");
+                inserttuple(cxt, proxyclassname, tmpstr, i);
+            }
+        }
+        return 1;
     }
 
     public String[] showselecttuple(Context cxt, String classOid, String[] attr_show, String boolstr){
@@ -572,9 +621,21 @@ public class Sysclass {
         return 1;
     }
 
-    public int trans_deleteclass(Context cxt, String[] element){
+    public int trans_deleteclass(Context cxt, String[] element){//删除类
         String[] direct = element[1].split(" *: *");
         delclass(cxt, direct[1]);
+        return 1;
+    }
+
+    public int trans_newdeputyclass(Context cxt, String[] element){//新建代理类
+        String classname = element[1].split(" *: *")[1];
+        String srcclassname = element[2].split(" *: *")[1];
+        String cond = element[3].split(" *: *")[1];
+        String tmp = element[4].split(" *: *")[1];
+        String[] attr_src = tmp.substring(0, tmp.length()-3).split("-@-");
+        tmp = element[5].split(" *: *")[1];
+        String[] attr_deputy = tmp.split("-@-");
+        newproxyclass(cxt,classname,srcclassname,attr_src,attr_deputy,cond);
         return 1;
     }
 

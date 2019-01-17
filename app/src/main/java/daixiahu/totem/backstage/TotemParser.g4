@@ -24,8 +24,8 @@ createSrcStatement returns [String s]//0
     ;
 
 createDeputyStatement returns [String s]//1
-    locals[String ret = ""]
-    :SELECTDEPUTY NAME{$ret += "id:1," + "classname:" + $NAME.text + ",";} SELECT NAME{$ret += "attr1:" + $NAME.text + ",";} ((AS NAME{$ret += "attr2:" + $NAME.text + ",";})? COMMA NAME{$ret += "attr1:" + $NAME.text + ",";})* (AS NAME{$ret += "attr2:" + $NAME.text + ",";})? FROM NAME{$ret += "srcclassname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s.replace("null", "") + ",";} SEMI {$s = $ret;}
+    locals[String ret = "",String attrsrc = "",String attrdeputy=""]
+    :SELECTDEPUTY NAME{$ret += "id:1," + "classname:" + $NAME.text + ",";$attrsrc = "attr: ";$attrdeputy = "attr:";} SELECT NAME{$attrsrc += $NAME.text + "-@-";} (AS NAME{$attrdeputy += $NAME.text + "-@-";} COMMA NAME{$attrsrc += $NAME.text + "-@-";})* AS NAME{$attrdeputy += $NAME.text;} FROM NAME{$ret += "srcclassname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s.replace("null", "") + ",";} SEMI {$s = $ret + $attrsrc + "," +$attrdeputy;}
     ;
 
 insertStatement returns [String s]//2
@@ -35,7 +35,7 @@ insertStatement returns [String s]//2
 
 deleteStatement returns [String s]//3
     locals[String ret = ""]
-    :DELETE FROM NAME{$ret += "id:3,classname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s;} SEMI {$s = $ret;}
+    :DELETE FROM NAME{$ret += "id:3,classname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s.replace("null","");} SEMI {$s = $ret;}
     ;
 
 dropTableStatement returns [String s]//4
@@ -48,11 +48,11 @@ selectStatement returns [String s]
     locals[String ret = ""]
     :SELECT {$ret += "id:5," + "attr:";}(NAME COMMA {$ret += $NAME.text + "-@-";})* NAME {$ret += $NAME.text + ",";}
      FROM NAME {$ret += "classname:" + $NAME.text + ",";}
-     WHERE whereStatement {$ret += "cond:" + $whereStatement.s;}
+     WHERE whereStatement {$ret += "cond:" + $whereStatement.s.replace("null","");}
      SEMI {$s = $ret;}
     |SELECT NAME CROSS {$ret += "id:6,";} NAME {$ret += $NAME.text + ",";} (CROSS NAME {$ret += $NAME.text + ",";})*
      FROM NAME {$ret += "classname:" + $NAME.text + ",";}
-     WHERE whereStatement {$ret += "cond:" + $whereStatement.s;}
+     WHERE whereStatement {$ret += "cond:" + $whereStatement.s.replace("null","");}
      SEMI {$s = $ret;}
     ;
 
