@@ -37,8 +37,9 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //translate(scanfSql.getText().toString());
-                testsql();
+                //init();
+                translate(scanfSql.getText().toString());
+                //testsql();
             }
         });
     }

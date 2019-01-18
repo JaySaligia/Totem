@@ -273,24 +273,8 @@ public class Sysclass {
     }
 
      int delclassporxyContext(Context cxt, String classOid){//删除代理类
-        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
-        int classtype = looker.getInt("classType", 0);
-
-        String[] link = looker.getString("classLink","").split("-@-");//获取link信息
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
-        if (classtype == 0) {
-            if (!link[0].equals("")) {
-                for (int i = 0; i < link.length; i++) {
-                    SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
-                    linkeditor.clear();
-                    linkeditor.apply();
-                    //SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
-                    //proxyeditor.clear();
-                    //proxyeditor.apply();
-                }
 
-            }
-        }
         editor.clear();//清空源类
         editor.apply();
         //修改系统表信息
@@ -312,7 +296,7 @@ public class Sysclass {
 
         String[] link = looker.getString("classLink","").split("-@-");//获取link信息
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
-        if (classtype == 0) {
+        if (classtype == 0) {//直接删除源类
             if (!link[0].equals("")) {
                 for (int i = 0; i < link.length; i++) {
                     SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
@@ -322,6 +306,16 @@ public class Sysclass {
                     //SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
                     //proxyeditor.clear();
                     //proxyeditor.apply();
+                }
+
+            }
+        }
+        else{//删除代理类
+            if (!link[0].equals("")) {
+                for (int i = 0; i < link.length; i++) {
+                    SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + link[i] + "-" + classOid, Context.MODE_PRIVATE).edit();//清空link类
+                    linkeditor.clear();
+                    linkeditor.apply();
                 }
 
             }
