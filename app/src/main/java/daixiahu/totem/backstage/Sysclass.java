@@ -272,6 +272,38 @@ public class Sysclass {
         return 1;
     }
 
+     int delclassporxyContext(Context cxt, String classOid){//删除代理类
+        SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        int classtype = looker.getInt("classType", 0);
+
+        String[] link = looker.getString("classLink","").split("-@-");//获取link信息
+        SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
+        if (classtype == 0) {
+            if (!link[0].equals("")) {
+                for (int i = 0; i < link.length; i++) {
+                    SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
+                    linkeditor.clear();
+                    linkeditor.apply();
+                    //SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
+                    //proxyeditor.clear();
+                    //proxyeditor.apply();
+                }
+
+            }
+        }
+        editor.clear();//清空源类
+        editor.apply();
+        //修改系统表信息
+        SharedPreferences syslooker = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE);
+        String idable = syslooker.getString("idable","");
+        int idcount = syslooker.getInt("idcount", 0);
+        SharedPreferences.Editor syseditor = cxt.getSharedPreferences("systotal", Context.MODE_PRIVATE).edit();
+        syseditor.putString("idable", classOid + "-@-" + idable);//将删除的类id加入墓碑中
+        syseditor.putInt("idcount", idcount - 1);//类总数-1
+        syseditor.apply();
+        return 1;
+    }
+
     public int delclass(Context cxt, String classname){//删除源类
         String classOid = getclassOid(cxt, classname)+"";
 
@@ -286,9 +318,10 @@ public class Sysclass {
                     SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();//清空link类
                     linkeditor.clear();
                     linkeditor.apply();
-                    SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
-                    proxyeditor.clear();
-                    proxyeditor.apply();
+                    delclassporxyContext(cxt, link[i]);
+                    //SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();//清空代理类
+                    //proxyeditor.clear();
+                    //proxyeditor.apply();
                 }
 
             }
