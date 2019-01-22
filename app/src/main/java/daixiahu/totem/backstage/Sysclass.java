@@ -240,7 +240,7 @@ public class Sysclass {
         //删除源类的元组
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         String tupleava = looker.getString("tupleAva", "");
-        int tuplecount = looker.getInt("tupleCount", 0);
+        //int tuplecount = looker.getInt("tupleCount", 0);
         String[] link = looker.getString("classLink", "").split("-@-");
         SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         editor.remove("tuple" + tuplenum);//从源类删除对象
@@ -261,10 +261,10 @@ public class Sysclass {
                 SharedPreferences proxylooker = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE);
                 SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();
                 String proxytupleava = proxylooker.getString("tupleAva", "");
-                int proxytuplecount = proxylooker.getInt("tupleCount", 0);
+                //int proxytuplecount = proxylooker.getInt("tupleCount", 0);
                 proxyeditor.remove("tuple" + proxytupleid);//从代理类中删除代理对象；
                 proxyeditor.putString("tupleAva", proxytupleid + "-@-" + proxytupleava);//增加墓碑元组id
-                proxyeditor.putInt("tupleCount", proxytuplecount - 1);//元组总数-1
+                //proxyeditor.putInt("tupleCount", proxytuplecount - 1);//元组总数-1
                 proxyeditor.apply();
             }
             else
@@ -279,56 +279,78 @@ public class Sysclass {
         int classtype = looker.getInt("classType", 0);
         String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
         int tuplecount = looker.getInt("tupleCount", 0);
-        SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
         for (int i = 0; i < tuplecount; i ++){
             if(booleaneval(cxt, classOid, i+"", boolstr)) {
-                //先修改源类中的属性
+                //修改源类中的属性
+                SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
                 String[] sptuple = looker.getString("tuple"+i+"","").split("-@-");
                 int index = getindex(attr, attr_name);
                 sptuple[index] = val;
                 editor.putString("tuple"+i+"", makestr_s(sptuple));
                 editor.apply();
-                //再更新代理类中的值
-                //updatedeputytuple(cxt, classOid, i + "");
+                //更新代理类中的信息
+                updatedeputytuple(cxt, classOid, i + "", attr, val);
             }
         }
         return 1;
     }
 
-    int updatedeputytuple(Context cxt, String classOid, String tuplenum){
-
+    int updatedeputytuple(Context cxt, String classOid, String tuplenum, String attr, String val){
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
-        String tupleava = looker.getString("tupleAva", "");
-        int tuplecount = looker.getInt("tupleCount", 0);
-        String[] link = looker.getString("classLink", "").split("-@-");
-        SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
-        editor.remove("tuple" + tuplenum);//从源类删除对象
-        editor.putString("tupleAva", tuplenum + "-@-" + tupleava);//增加墓碑元组id
-        //editor.putInt("tupleCount", tuplecount - 1);//元组总数-1
-        editor.apply();
-        //删除link表中的元素和对应代理类中的代理对象
+        String[] link = looker.getString("classLink", "").split("-@-");//得到link的信息
+        String[] attrlist = looker.getString("attrReal_name","").split("-@-");
         if (link[0].equals(""))
             return 0;//没有link信息
         for (int i = 0; i < link.length; i ++){
             SharedPreferences linklooker = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE);
-            SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();
-            String proxytupleid = linklooker.getString("src" + tuplenum, "");
-            if (!proxytupleid.equals("")){
-                linkeditor.remove("src" + tuplenum);
-                linkeditor.remove("proxy" + proxytupleid);//删除“双向指针”
-                linkeditor.apply();
-                SharedPreferences proxylooker = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE);
-                SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();
-                String proxytupleava = proxylooker.getString("tupleAva", "");
-                int proxytuplecount = proxylooker.getInt("tupleCount", 0);
-                proxyeditor.remove("tuple" + proxytupleid);//从代理类中删除代理对象；
-                proxyeditor.putString("tupleAva", proxytupleid + "-@-" + proxytupleava);//增加墓碑元组id
-                proxyeditor.putInt("tupleCount", proxytuplecount - 1);//元组总数-1
-                proxyeditor.apply();
+            String proxytupleid = linklooker.getString("src" + tuplenum, "");//得到对应的在代理类中的id
+            String cond = linklooker.getString("Cond", "");//得到生成代理类的条件语句
+            String srcattr[] = linklooker.getString("Attr", "").split("-@-");
+
+            if (!proxytupleid.equals("")) {//原来的link表中已经有了双向指针
+                if(booleaneval(cxt, classOid, tuplenum, cond)){//依然符合筛选规则
+                    int index = getindex(attr, srcattr);
+                    if(index != -1){//该属性出现在了代理类中
+                        SharedPreferences proxylooker = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE);
+                        SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();
+                        String[] deputytuple = proxylooker.getString("tuple"+proxytupleid, "").split("-@-");
+                        deputytuple[index] = val;
+                        proxyeditor.putString("tuple"+proxytupleid, makestr_s(deputytuple));
+                        proxyeditor.apply();
+                    }
+                }
+                else{//不符合筛选要求。从代理类中删除该对象
+                    SharedPreferences.Editor linkeditor = cxt.getSharedPreferences("linkclass" + classOid + "-" + link[i], Context.MODE_PRIVATE).edit();
+                    linkeditor.remove("src" + tuplenum);
+                    linkeditor.remove("proxy" + proxytupleid);//删除“双向指针”
+                    linkeditor.apply();
+                    SharedPreferences proxylooker = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE);
+                    SharedPreferences.Editor proxyeditor = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE).edit();
+                    String proxytupleava = proxylooker.getString("tupleAva", "");
+                    //int proxytuplecount = proxylooker.getInt("tupleCount", 0);
+                    proxyeditor.putString("tupleAva", proxytupleid + "-@-" + proxytupleava);//增加墓碑元组id
+                    proxyeditor.remove("tuple"+proxytupleid);//从代理类中删除代理对象；
+                    //proxyeditor.putInt("tupleCount", proxytuplecount - 1);//元组总数-1
+                    proxyeditor.apply();
+                }
             }
-            else
-                linkeditor.apply();
+            else{//原来的link表中没有指针
+                if(booleaneval(cxt, classOid, tuplenum, cond)){//改变了的元组符合筛选条件,加入代理中
+                    SharedPreferences proxylooker = cxt.getSharedPreferences("sysclass" + link[i], Context.MODE_PRIVATE);
+                    String proxyclassname = proxylooker.getString("className","");
+                    int[] attrindex = new int[srcattr.length];
+                    for (int j = 0; j < srcattr.length; j++){
+                        attrindex[j] = getindex(srcattr[j], attrlist);
+                    }
+                    String tmp = "";
+                    tmp = choosedeputytuple(cxt, classOid,  tuplenum, attrindex);
+                    String[] tmpstr = tmp.split("-@-");
+                    inserttuple(cxt, proxyclassname, tmpstr,Integer.parseInt(tuplenum));
+                }
+            }
+
         }
+
         return 1;
     }
 
@@ -417,7 +439,7 @@ public class Sysclass {
         for(int i = 0; i < b.length; i++){
             if (a.equals(b[i])) return i;
         }
-        return 0;
+        return -1;
     }
 
     Boolean booltest(String[] tupleattr, String attr_val, String val,String[] attr_name, String[] attr_type, int cal_type){//参数：指定的元组，符号左边（待测属性），符号右边（待测值），属性名称，属性类型，符号类型
@@ -462,6 +484,9 @@ public class Sysclass {
             attr_name = looker.getString("attrVirtual_name", "").split("-@-");
             attr_type = looker.getString("attrVirtual_type", "").split("-@-");
         }
+        String tuplestr = looker.getString("tuple"+tupleid,"");
+        if (tuplestr.equals(""))
+            return false;
         String[] tupleattr = looker.getString("tuple" + tupleid, "").split("-@-");
         String booltmp = boolstr.replace("(", "");
         booltmp = booltmp.replace(")", "");

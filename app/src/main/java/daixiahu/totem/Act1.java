@@ -63,9 +63,16 @@ public class Act1 extends AppCompatActivity {
         translate("insert into class1 values (8, Hasee, male, 21, 92);");
         translate("insert into class1 values (9, Ice, female, 24, 50);");
         translate("insert into class1 values (10, Jason, male, 22, 77);");
-        translate("update class1 set sname = Anna where sname=Alice;");
-        translate("select sno,sname from class1 where grade>0;");
+        //translate("update class1 set sname = Anna where sname=Alice;");
+        //translate("select sno,sname from class1 where grade>0;");
         //translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=male;");
+
+        translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where sex=male;");
+        translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where sex=female;");
+        translate("update class1 set sex = female where sname=Alice;");
+        translate("select num, goal from femalegoodstu where num>0;");
+
+        //translate("select sno,sname from class1 where grade>0;");
         //translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=female;");
         //translate("select num, goal from malegoodstu where goal>85 OR num>5;");
         //translate("select num, goal from malegoodstu where goal>80;");
