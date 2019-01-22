@@ -37,9 +37,10 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //init();
-                translate(scanfSql.getText().toString());
-                //testsql();
+                init();
+                //translate(scanfSql.getText().toString());
+                //translate("update class1 set sname = xiaoming where sname=xiaoli;");
+                testsql();
             }
         });
     }
@@ -62,14 +63,16 @@ public class Act1 extends AppCompatActivity {
         translate("insert into class1 values (8, Hasee, male, 21, 92);");
         translate("insert into class1 values (9, Ice, female, 24, 50);");
         translate("insert into class1 values (10, Jason, male, 22, 77);");
-        translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=male;");
-        translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=female;");
-        translate("select num, goal from malegoodstu where goal>85 OR num>5;");
-        translate("select num, goal from malegoodstu where goal>80;");
-        translate("delete from class1 where sname=Hasee;");
-        translate("select num, goal from malegoodstu where goal>80;");
-        translate("select femalegoodstu->class1.sname from femalegoodstu where goal>80;");
-        translate("drop class class1;");
+        translate("update class1 set sname = Anna where sname=Alice;");
+        translate("select sno,sname from class1 where grade>0;");
+        //translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=male;");
+        //translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=female;");
+        //translate("select num, goal from malegoodstu where goal>85 OR num>5;");
+        //translate("select num, goal from malegoodstu where goal>80;");
+        //translate("delete from class1 where sname=Hasee;");
+        //translate("select num, goal from malegoodstu where goal>80;");
+        //translate("select femalegoodstu->class1.sname from femalegoodstu where goal>80;");
+        //translate("drop class class1;");
     }
 
     void translate(String expr){
@@ -84,7 +87,7 @@ public class Act1 extends AppCompatActivity {
             Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
         }
         else{
-            //Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
             Sysclass c = new Sysclass();
             String[] element = test.split(" *, *");
             String id = element[0].split(" *: *")[1];
@@ -97,8 +100,10 @@ public class Act1 extends AppCompatActivity {
                 case "4":c.trans_deleteclass(Act1.this, element);showmsg = "删除类成功";break;//删除类
                 case "5":updateResultTable(c.trans_selecttuple(Act1.this, element));showmsg = "选择对象成功";break;//选择特定对象
                 case "6":updateResultTable(c.trans_selectdeputytuple(Act1.this, element));showmsg = "跨类查询成功";break;//跨类查询
+                case "7":c.trans_updatetuple(Act1.this, element);showmsg = "修改属性成功";break;//修改对象属性
+
             }
-            Toast.makeText(Act1.this, showmsg, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(Act1.this, showmsg, Toast.LENGTH_SHORT).show();
         }
     }
 

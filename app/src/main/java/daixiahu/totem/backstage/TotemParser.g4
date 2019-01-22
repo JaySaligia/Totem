@@ -12,6 +12,7 @@ sqlStatement returns[String s]
     |dropTableStatement{$s = $dropTableStatement.s;}//4
     |deleteStatement{$s = $deleteStatement.s;}//3
     |selectStatement{$s = $selectStatement.s;}//5,6
+    |updateStatement{$s = $updateStatement.s;}//7
     ;
 
 createStatement returns [String s]
@@ -56,6 +57,10 @@ selectStatement returns [String s]
      SEMI {$s = $ret;}
     ;
 
+updateStatement returns [String s]
+    locals[String ret = ""]
+    :UPDATE NAME{$ret += "id:7, classname:" + $NAME.text + ",";} SET NAME{$ret += "attr:" + $NAME.text + ",";} EQ NAME{$ret += "val:" + $NAME.text + ",";} WHERE whereStatement SEMI{$ret += "cond:" + $whereStatement.s; $s = $ret;}
+    ;
 
 /*
 whereStatement returns [String s]
@@ -80,4 +85,5 @@ whereStatementdivide returns [String s]
     :AND whereStatement {$s = " AND " + $whereStatement.s;}
     |OR whereStatement {$s = " OR " + $whereStatement.s;}
     ;
+
 
