@@ -25,8 +25,8 @@ createSrcStatement returns [String s]//0
     ;
 
 createDeputyStatement returns [String s]//1
-    locals[String ret = "",String attrsrc = "",String attrdeputy=""]
-    :SELECTDEPUTY NAME{$ret += "id:1," + "classname:" + $NAME.text + ",";$attrsrc = "attr: ";$attrdeputy = "attr:";} SELECT NAME{$attrsrc += $NAME.text + "-@-";} (AS NAME{$attrdeputy += $NAME.text + "-@-";} COMMA NAME{$attrsrc += $NAME.text + "-@-";})* AS NAME{$attrdeputy += $NAME.text;} FROM NAME{$ret += "srcclassname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s.replace("null", "") + ",";} SEMI {$s = $ret + $attrsrc + "," +$attrdeputy;}
+    locals[String ret = "",String attrsrc = "",String attrdeputy="", String attrreal="", String attrtype=""]
+    :SELECTDEPUTY NAME{$ret += "id:1," + "classname:" + $NAME.text + ",";$attrsrc = "attr: ";$attrdeputy = "attr:";} SELECT NAME{$attrsrc += $NAME.text + "-@-";} (AS NAME{$attrdeputy += $NAME.text + "-@-";} COMMA NAME{$attrsrc += $NAME.text + "-@-";})* AS NAME{$attrdeputy += $NAME.text;} {$attrreal = "attrreal:";$attrtype = "type:";}(COMMA NAME ATTRTYPE {$attrreal += "-@-" + $NAME.text;$attrtype += "-@-" + $ATTRTYPE.text;})* FROM NAME{$ret += "srcclassname:" + $NAME.text + ",";} WHERE whereStatement{$ret += "cond:" + $whereStatement.s.replace("null", "") + ",";} SEMI {$s = $ret + $attrsrc + "," +$attrdeputy + "," + $attrreal + "," + $attrtype;}
     ;
 
 insertStatement returns [String s]//2

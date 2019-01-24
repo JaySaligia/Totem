@@ -172,7 +172,7 @@ public class Sysclass {
         return makestr_s(type_v);
     }
 
-    public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String boolstr){
+    public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String boolstr, String attr_r, String attr_type){
         String classOid = getid(cxt);
         String sysclassOid = getclassOid(cxt, sysclassname)+"";
         int attrlen_v = attr_v.length;
@@ -193,7 +193,33 @@ public class Sysclass {
         editor.apply();
         updatesystotal(cxt);
         insertdeputy(cxt,sysclassOid,classname,attr_v, boolstr);
+        //实属性
+        SharedPreferences looker1 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String attrvname = looker1.getString("attrVirtual_name","");
+        String attrvtype = looker1.getString("attrVirtual_name", "");
+        int tuplecount = looker1.getInt("tupleCount",0);
 
+        SharedPreferences.Editor editor_real1 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
+        editor_real1.putString("attrVirtual_name", attrvname + attr_r);
+        attr_type = attr_type.replaceAll("[Ss][Tt][Rr][Ii][Nn][Gg]", "0");
+        attr_type = attr_type.replaceAll("[In][Nn][Tt]", "1");
+        editor_real1.putString("attrVirtual_type", attrvtype + attr_type);
+        editor_real1.apply();
+
+        SharedPreferences looker2 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+        String[] tmp = looker2.getString("attrVirtual_name", "").split("-@-");
+        int lenattr_r = tmp.length-attrlen_v;
+        String append = "";
+        for (int i = 0; i< lenattr_r; i++){
+            append += "-@-null";
+        }
+        for (int i = 0;i <tuplecount; i++){
+            SharedPreferences looker3 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+            String tmptuple = looker3.getString("tuple"+i+"","");
+            SharedPreferences.Editor editor_real2 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
+            editor_real2.putString("tuple"+i+"", tmptuple+append);
+            editor_real2.apply();
+        }
         return 1;
     }
 
@@ -807,7 +833,9 @@ public class Sysclass {
         String[] attr_src = tmp.substring(0, tmp.length()-3).split("-@-");
         tmp = element[5].split(" *: *")[1];
         String[] attr_deputy = tmp.split("-@-");
-        newproxyclass(cxt,classname,srcclassname,attr_src,attr_deputy,cond);
+        String attr_real = element[6].split(" *: *")[1];//实属性
+        String attr_type = element[7].split(" *: *")[1];//实属性类型
+        newproxyclass(cxt,classname,srcclassname,attr_src,attr_deputy,cond, attr_real, attr_type);
         return 1;
     }
 
