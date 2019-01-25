@@ -193,10 +193,10 @@ public class Sysclass {
         editor.apply();
         updatesystotal(cxt);
         insertdeputy(cxt,sysclassOid,classname,attr_v, boolstr);
-        //实属性
+        //增加实属性
         SharedPreferences looker1 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         String attrvname = looker1.getString("attrVirtual_name","");
-        String attrvtype = looker1.getString("attrVirtual_name", "");
+        String attrvtype = looker1.getString("attrVirtual_type", "");
         int tuplecount = looker1.getInt("tupleCount",0);
 
         SharedPreferences.Editor editor_real1 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
@@ -299,25 +299,27 @@ public class Sysclass {
         return 1;
     }
 
-    int updatesrctuple(Context cxt, String classname,String boolstr,String attr, String val){
+    int updatetuple(Context cxt, String classname,String boolstr,String attr, String val){
         String classOid = getclassOid(cxt, classname)+"";
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         int classtype = looker.getInt("classType", 0);
         String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
+        //修改指定类
         int tuplecount = looker.getInt("tupleCount", 0);
-        for (int i = 0; i < tuplecount; i ++){
-            if(booleaneval(cxt, classOid, i+"", boolstr)) {
-                //修改源类中的属性
+        for (int i = 0; i < tuplecount; i++) {
+            if (booleaneval(cxt, classOid, i + "", boolstr)) {
+                //修改指定类中的属性
                 SharedPreferences.Editor editor = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
-                String[] sptuple = looker.getString("tuple"+i+"","").split("-@-");
+                String[] sptuple = looker.getString("tuple" + i + "", "").split("-@-");
                 int index = getindex(attr, attr_name);
                 sptuple[index] = val;
-                editor.putString("tuple"+i+"", makestr_s(sptuple));
+                editor.putString("tuple" + i + "", makestr_s(sptuple));
                 editor.apply();
-                //更新代理类中的信息
-                updatedeputytuple(cxt, classOid, i + "", attr, val);
+                //如果是源类，需要更新代理类中的信息
+                if (classtype == 0)
+                    updatedeputytuple(cxt, classOid, i + "", attr, val);
+                }
             }
-        }
         return 1;
     }
 
@@ -852,7 +854,7 @@ public class Sysclass {
         String attr = element[2].split(" *: *")[1];
         String val = element[3].split(" *: *")[1];
         String cond = element[4].split(" *: *")[1];
-        updatesrctuple(cxt, classname, cond, attr, val);
+        updatetuple(cxt, classname, cond, attr, val);
         return 1;
     }
 }

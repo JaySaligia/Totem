@@ -53,21 +53,24 @@ public class Act1 extends AppCompatActivity {
     void testsql(){
         init();
         translate("create class class1 (sno int,sname string, sex string, age int, grade int);");
-        //translate("insert into class1 values (1, Alice, male, 22, 100);");
-        //translate("insert into class1 values (2, Bob, female, 21, 90);");
-        //translate("insert into class1 values (3, Carolu, female, 22, 55);");
-        //translate("insert into class1 values (4, Dogge, male, 24, 83);");
-        //translate("insert into class1 values (5, Ellen, female, 21, 84);");
-        //translate("insert into class1 values (6, Frank, male, 20, 48);");
-        //translate("insert into class1 values (7, Garen, female, 23, 78);");
-        //translate("insert into class1 values (8, Hasee, male, 21, 92);");
-        //translate("insert into class1 values (9, Ice, female, 24, 50);");
-        //translate("insert into class1 values (10, Jason, male, 22, 77);");
-        //translate("update class1 set sname = Anna where sname=Alice;");
+        translate("insert into class1 values (1, Alice, male, 22, 100);");
+        translate("insert into class1 values (2, Bob, female, 21, 90);");
+        translate("insert into class1 values (3, Carolu, female, 22, 55);");
+        translate("insert into class1 values (4, Dogge, male, 24, 83);");
+        translate("insert into class1 values (5, Ellen, female, 21, 84);");
+        translate("insert into class1 values (6, Frank, male, 20, 48);");
+        translate("insert into class1 values (7, Garen, female, 23, 78);");
+        translate("insert into class1 values (8, Hasee, male, 21, 92);");
+        translate("insert into class1 values (9, Ice, female, 24, 50);");
+        translate("insert into class1 values (10, Jason, male, 22, 77);");
+        translate("update class1 set sname = Anna where sname=Alice;");
         //translate("select sno,sname from class1 where grade>0;");
         //translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=male;");
 
         translate("create selectdeputy malegoodstu select sno as num, grade as goal,addr string from class1 where sex=male;");
+        translate("update malegoodstu set addr = 100 where num>0;");
+        //translate("select class1->malegoodstu.addr from class1 where grade>80;");
+        translate("select num, goal,addr from malegoodstu where num>0;");
         //translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where sex=female;");
         //translate("update class1 set sex = female where sname=Alice;");
         //translate("select num, goal from femalegoodstu where num>0;");
@@ -101,7 +104,7 @@ public class Act1 extends AppCompatActivity {
             String showmsg = "";
             switch (id){
                 case "0":c.trans_newsrcclass(Act1.this, element);showmsg = "新建源类成功";break;//新建源类
-                //case "1":c.trans_newdeputyclass(Act1.this, element);showmsg = "新建代理类成功";break;//新建代理类
+                case "1":c.trans_newdeputyclass(Act1.this, element);showmsg = "新建代理类成功";break;//新建代理类
                 case "2":c.trans_inserttuple(Act1.this, element);showmsg = "插入对象成功";break;//插入对象
                 case "3":c.trans_deletetuple(Act1.this, element);showmsg = "删除对象成功";break;//删除对象
                 case "4":c.trans_deleteclass(Act1.this, element);showmsg = "删除类成功";break;//删除类
