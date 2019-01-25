@@ -37,10 +37,9 @@ public class Act1 extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                init();
-                //translate(scanfSql.getText().toString());
-                //translate("update class1 set sname = xiaoming where sname=xiaoli;");
-                testsql();
+                //init();
+                translate(scanfSql.getText().toString());
+                //testsql();
             }
         });
     }
@@ -52,37 +51,38 @@ public class Act1 extends AppCompatActivity {
 
     void testsql(){
         init();
-        translate("create class class1 (sno int,sname string, sex string, age int, grade int);");
-        translate("insert into class1 values (1, Alice, male, 22, 100);");
-        translate("insert into class1 values (2, Bob, female, 21, 90);");
-        translate("insert into class1 values (3, Carolu, female, 22, 55);");
-        translate("insert into class1 values (4, Dogge, male, 24, 83);");
-        translate("insert into class1 values (5, Ellen, female, 21, 84);");
-        translate("insert into class1 values (6, Frank, male, 20, 48);");
-        translate("insert into class1 values (7, Garen, female, 23, 78);");
-        translate("insert into class1 values (8, Hasee, male, 21, 92);");
-        translate("insert into class1 values (9, Ice, female, 24, 50);");
-        translate("insert into class1 values (10, Jason, male, 22, 77);");
-        translate("update class1 set sname = Anna where sname=Alice;");
-        //translate("select sno,sname from class1 where grade>0;");
-        //translate("create selectdeputy malegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=male;");
-
-        translate("create selectdeputy malegoodstu select sno as num, grade as goal,addr string from class1 where sex=male;");
-        translate("update malegoodstu set addr = 100 where num>0;");
-        //translate("select class1->malegoodstu.addr from class1 where grade>80;");
-        translate("select num, goal,addr from malegoodstu where num>0;");
-        //translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where sex=female;");
-        //translate("update class1 set sex = female where sname=Alice;");
-        //translate("select num, goal from femalegoodstu where num>0;");
-
-        //translate("select sno,sname from class1 where grade>0;");
-        //translate("create selectdeputy femalegoodstu select sno as num, grade as goal from class1 where grade>80 AND sex=female;");
-        //translate("select num, goal from malegoodstu where goal>85 OR num>5;");
-        //translate("select num, goal from malegoodstu where goal>80;");
-        //translate("delete from class1 where sname=Hasee;");
-        //translate("select num, goal from malegoodstu where goal>80;");
-        //translate("select femalegoodstu->class1.sname from femalegoodstu where goal>80;");
-        //translate("drop class class1;");
+        translate("create class goods(gno int, type string, price int);");
+        translate("insert into goods values(1, pc, 3000);");
+        translate("insert into goods values(2, pc, 3100);");
+        translate("insert into goods values(3, pc, 3200);");
+        translate("insert into goods values(4, pc, 3300);");
+        translate("insert into goods values(5, laptop, 2100);");
+        translate("insert into goods values(6, laptop, 2200);");
+        translate("insert into goods values(7, laptop, 2300);");
+        translate("insert into goods values(8, laptop, 2400);");
+        translate("insert into goods values(9, pc, 4000);");
+        translate("insert into goods values(10, pc, 4100);");
+        translate("insert into goods values(11, laptop, 4200);");
+        translate("insert into goods values(12, pc, 4300);");
+        translate("insert into goods values(13, laptop, 3100);");
+        translate("insert into goods values(14, laptop, 3200);");
+        translate("insert into goods values(15, laptop, 3300);");
+        translate("insert into goods values(16, laptop, 3400);");
+        translate("select gno,type,price from goods where gno>0;");
+        translate("create selectdeputy Japangoods select gno as num, type as model, price as value, tax string from goods where gno<12");
+        translate("select num,model,value,tax from Japangoods where num>0;");
+        translate("create selectdeputy USgoods select gno as num, type as model, price as value, tax string from goods where gno>8;");
+        translate("select num,model,value,tax from USgoods where num>0;");
+        translate("update goods set gno = 17 where gno=1");
+        translate("select num,model,value,tax from Japangoods where num>0;");
+        translate("select num,model,value,tax from USgoods where num>0;");
+        translate("update Japangoods set tax = 5% where model=pc");
+        translate("update Japangoods set tax = 4% where model=laptop");
+        translate("update USgoods set tax = 3% where model=pc");
+        translate("update USgoods set tax = 2% where model=laptop");
+        translate("select num,model,value,tax from Japangoods where num>0;");
+        translate("select num,model,value,tax from USgoods where num>0;");
+        translate("select USgoods->goods->Japangoods.tax from USgoods where num>8 AND num<12");
     }
 
     void translate(String expr){
@@ -97,7 +97,8 @@ public class Act1 extends AppCompatActivity {
             Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(Act1.this, test, Toast.LENGTH_SHORT).show();
+            result.removeAllViews();
             Sysclass c = new Sysclass();
             String[] element = test.split(" *, *");
             String id = element[0].split(" *: *")[1];
@@ -113,7 +114,7 @@ public class Act1 extends AppCompatActivity {
                 case "7":c.trans_updatetuple(Act1.this, element);showmsg = "修改属性成功";break;//修改对象属性
 
             }
-            //Toast.makeText(Act1.this, showmsg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Act1.this, showmsg, Toast.LENGTH_SHORT).show();
         }
     }
 

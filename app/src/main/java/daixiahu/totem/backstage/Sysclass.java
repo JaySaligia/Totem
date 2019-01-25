@@ -107,7 +107,7 @@ public class Sysclass {
         return ret;
     }
 
-    public int inserttuple(Context cxt, String classname, String[] tuple,int insert_type){//插入元组,insert_type为插入类型，-1为源类，其余为代理类中对象对应在源类中的id
+    int inserttuple(Context cxt, String classname, String[] tuple,int insert_type){//插入元组,insert_type为插入类型，-1为源类，其余为代理类中对象对应在源类中的id
         int tmp = getclassOid(cxt, classname);
         if ( tmp == -1)
             return -1;//该类不存在
@@ -139,6 +139,20 @@ public class Sysclass {
             linkeditor.putString("src" + insert_type+"", tupleid);
             linkeditor.putString("proxy" + tupleid, insert_type+"");
             linkeditor.apply();
+
+            SharedPreferences looker2 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+            String[] tmp1 = looker2.getString("attrVirtual_name", "").split("-@-");
+            int attrlen_v = looker2.getInt("attrVirtual_num",0);
+            int lenattr_r = tmp1.length-attrlen_v;
+            String append = "";
+            for (int i = 0; i< lenattr_r; i++){
+                append += "-@-null";
+            }
+            SharedPreferences looker3 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
+            String tmptuple = looker3.getString("tuple"+tupleid,"");
+            SharedPreferences.Editor editor_real2 = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE).edit();
+            editor_real2.putString("tuple"+tupleid, tmptuple+append);
+            editor_real2.apply();
         }
         return 1;
     }
@@ -608,7 +622,7 @@ public class Sysclass {
         }
         if (crosspath.length > 2){
             SharedPreferences linklooker = cxt.getSharedPreferences("linkclass" + getclassOid(cxt, crosspath[1]) + "" + "-" + getclassOid(cxt, crosspath[2] + ""), Context.MODE_PRIVATE);
-            ret = linklooker.getString("src" + tupleid,"none");
+            ret = linklooker.getString("src" + ret,"none");
 
         }
             return ret;

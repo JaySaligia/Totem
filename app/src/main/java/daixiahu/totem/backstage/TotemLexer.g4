@@ -19,7 +19,7 @@ WHERE: [Ww][Hh][Ee][Rr][Ee];
 AS: [Aa][Ss];
 AND: [Aa][Nn][Dd];
 OR: [Oo][Rr];
-NAME: [A-Za-z0-9]+;
+NAME: [A-Za-z0-9%]+;
 COND: ([A-Za-z0-9]+[=][A-Za-z0-9]+) | ([A-Za-z0-9]+[<>][0-9]+);
 LR_BARCKET: '(';
 RR_BARCKET: ')';
