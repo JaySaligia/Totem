@@ -186,7 +186,7 @@ public class Sysclass {
         return makestr_s(type_v);
     }
 
-    public int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String boolstr, String attr_r, String attr_type){
+    int newproxyclass(Context cxt, String classname, String sysclassname,String[] attr_v, String[] attr_rename, String boolstr, String attr_r, String attr_type){
         String classOid = getid(cxt);
         String sysclassOid = getclassOid(cxt, sysclassname)+"";
         int attrlen_v = attr_v.length;
@@ -276,7 +276,7 @@ public class Sysclass {
         return 1;
     }
     */
-    public int deltuple(Context cxt, String classOid, String tuplenum){
+    int deltuple(Context cxt, String classOid, String tuplenum){
         //删除源类的元组
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         String tupleava = looker.getString("tupleAva", "");
@@ -582,7 +582,7 @@ public class Sysclass {
 
 
 
-    public String[] showselecttuple(Context cxt, String classOid, String[] attr_show, String boolstr){
+    String[] showselecttuple(Context cxt, String classOid, String[] attr_show, String boolstr){
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         int classtype = looker.getInt("classType", 0);
         String[] attr_name = (classtype == 0)?looker.getString("attrReal_name", "").split("-@-"):looker.getString("attrVirtual_name","").split("-@-");
@@ -661,7 +661,7 @@ public class Sysclass {
     }
 
 
-    public int delselecttuple(Context cxt, String classOid, String boolstr){
+    int delselecttuple(Context cxt, String classOid, String boolstr){
         SharedPreferences looker = cxt.getSharedPreferences("sysclass" + classOid, Context.MODE_PRIVATE);
         int classtype = looker.getInt("classType", 0);
         int tuplecount = looker.getInt("tupleCount", 0);
@@ -863,7 +863,7 @@ public class Sysclass {
         return showcrosstuple(cxt, classname, cond, attr, crosspath);
     }
 
-    public int trans_updatetuple(Context cxt, String[] element){
+    public int trans_updatetuple(Context cxt, String[] element){//更新数据
         String classname = element[1].split(" *: *")[1];
         String attr = element[2].split(" *: *")[1];
         String val = element[3].split(" *: *")[1];

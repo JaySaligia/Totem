@@ -33,15 +33,22 @@ public class Act1 extends AppCompatActivity {
         setContentView(R.layout.act1_layout);
         scanfSql = (EditText) findViewById(R.id.scanfSql);
         Button button1 = (Button) findViewById(R.id.Act1_Button1);
+        Button button2 = (Button) findViewById(R.id.Act1_Button2);
         result = (TableLayout) findViewById(R.id.result);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                init();
+            }
+        });
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //init();
                 translate(scanfSql.getText().toString());
-                //testsql();
             }
         });
+
+
     }
 
     void init(){
@@ -69,20 +76,21 @@ public class Act1 extends AppCompatActivity {
         translate("insert into goods values(15, laptop, 3300);");
         translate("insert into goods values(16, laptop, 3400);");
         translate("select gno,type,price from goods where gno>0;");
-        translate("create selectdeputy Japangoods select gno as num, type as model, price as value, tax string from goods where gno<12");
+        translate("create selectdeputy Japangoods select gno as num, type as model, price as value, tax string from goods where gno<12;");
         translate("select num,model,value,tax from Japangoods where num>0;");
         translate("create selectdeputy USgoods select gno as num, type as model, price as value, tax string from goods where gno>8;");
         translate("select num,model,value,tax from USgoods where num>0;");
-        translate("update goods set gno = 17 where gno=1");
+        translate("update goods set gno = 17 where gno=1;");
         translate("select num,model,value,tax from Japangoods where num>0;");
         translate("select num,model,value,tax from USgoods where num>0;");
-        translate("update Japangoods set tax = 5% where model=pc");
-        translate("update Japangoods set tax = 4% where model=laptop");
-        translate("update USgoods set tax = 3% where model=pc");
-        translate("update USgoods set tax = 2% where model=laptop");
+        translate("update Japangoods set tax = 5% where model=pc;");
+        translate("update Japangoods set tax = 4% where model=laptop;");
+        translate("update USgoods set tax = 3% where model=pc;");
+        translate("update USgoods set tax = 2% where model=laptop;");
         translate("select num,model,value,tax from Japangoods where num>0;");
         translate("select num,model,value,tax from USgoods where num>0;");
-        translate("select USgoods->goods->Japangoods.tax from USgoods where num>8 AND num<12");
+        translate("select USgoods->goods->Japangoods.tax from USgoods where num>8 AND num<12;");
+        translate("select Japangoods->goods->USgoods.tax from Japangoods where num>8 AND num<12;");
     }
 
     void translate(String expr){
