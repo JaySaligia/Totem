@@ -20,6 +20,8 @@ import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.File;
+
 import daixiahu.totem.backstage.Sysclass;
 import daixiahu.totem.backstage.TotemLexer;
 import daixiahu.totem.backstage.TotemParser;
@@ -51,10 +53,26 @@ public class Act1 extends AppCompatActivity {
 
     }
 
+    void deleteFile(File dir) {
+        if (dir == null || !dir.exists() || !dir.isDirectory())
+            return;
+        for (File file : dir.listFiles()) {
+            if (file.isFile())
+                file.delete(); // 删除所有文件
+            else if (file.isDirectory())
+                deleteFile(file); // 递规的方式删除文件夹
+        }
+    }
+
     void init(){
+        File dir = new File("//data//data//daixiahu.totem//shared_prefs");
+        deleteFile(dir);
         Sysclass c = new Sysclass();
         c.init(this);
+        Toast.makeText(Act1.this, "已完成初始化", Toast.LENGTH_SHORT).show();
     }
+
+
 
     void testsql(){
         init();
